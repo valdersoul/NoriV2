@@ -22,6 +22,8 @@
 #include <nori/sampler.h>
 #include <nori/camera.h>
 #include <nori/emitter.h>
+#include <nori/areaLight.h>
+//#include <nori/volume.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -61,13 +63,30 @@ void Scene::addChild(NoriObject *obj) {
                 Mesh *mesh = static_cast<Mesh *>(obj);
                 m_bvh->addMesh(mesh);
                 m_meshes.push_back(mesh);
+
+                //check if the mesh is an emitter
+                if(mesh->isEmitter()) {
+                    Emitter* areaLightEM = mesh->getEmitter();
+
+                    //add the Emitter to the list of emitters
+                    m_emitters.push_back(areaLightEM);
+
+                    areaLight* aEM = static_cast<areaLight *>(areaLightEM);
+                    aEM->setMesh(mesh);
+                }
             }
             break;
         
         case EEmitter: {
-                //Emitter *emitter = static_cast<Emitter *>(obj);
-                /* TBD */
-                throw NoriException("Scene::addChild(): You need to implement this for emitters");
+                Emitter *emitter = static_cast<Emitter *>(obj);
+                m_emitters.push_back(emitter);
+
+                if(emitter->toString() == "diskLight" || emitter->toString() == "envMap") {
+                    m_distantEmitter = emitter;
+                }
+
+                break;
+                //throw NoriException("Scene::addChild(): You need to implement this for emitters");
             }
             break;
 
@@ -88,7 +107,13 @@ void Scene::addChild(NoriObject *obj) {
                 throw NoriException("There can only be one integrator per scene!");
             m_integrator = static_cast<Integrator *>(obj);
             break;
-
+        case EMedium:
+            {
+                Volume *vol = static_cast<Volume *>(obj);
+                m_volumes.push_back(vol);
+                break;
+            }
+            break;
         default:
             throw NoriException("Scene::addChild(<%s>) is not supported!",
                 classTypeName(obj->getClassType()));
@@ -104,17 +129,28 @@ std::string Scene::toString() const {
         meshes += "\n";
     }
 
+    std::string volumes;
+    for (size_t i=0; i<m_volumes.size(); ++i) {
+        volumes += std::string("  ") + indent(m_volumes[i]->toString(), 2);
+        if (i + 1 < m_volumes.size())
+            volumes += ",";
+        volumes += "\n";
+    }
+
     return tfm::format(
         "Scene[\n"
         "  integrator = %s,\n"
         "  sampler = %s\n"
         "  camera = %s,\n"
+        "  volumes = {\n"
+        "  %s  }\n"
         "  meshes = {\n"
         "  %s  }\n"
         "]",
         indent(m_integrator->toString()),
         indent(m_sampler->toString()),
         indent(m_camera->toString()),
+        indent(volumes, 2),
         indent(meshes, 2)
     );
 }

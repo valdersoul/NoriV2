@@ -21,7 +21,8 @@
 
 #include <nori/common.h>
 #include <nori/sampler.h>
-
+#include <nori/HSWrapper.h>
+#include <nori/bitmap.h>
 NORI_NAMESPACE_BEGIN
 
 /// A collection of useful warping functions for importance sampling
@@ -39,11 +40,17 @@ public:
     /// Uniformly sample a vector on a 2D disk with radius 1, centered around the origin
     static Point2f squareToUniformDisk(const Point2f &sample);
 
+    /// Uniformly sample a vector on a Cylinder, centered around the origin
+    static Point2f squareToUniformCylinder(const Point2f &sample, float hightStart, float hightStop);
+
     /// Probability density of \ref squareToUniformDisk()
     static float squareToUniformDiskPdf(const Point2f &p);
 
     /// Uniformly sample a vector on the unit sphere with respect to solid angles
     static Vector3f squareToUniformSphere(const Point2f &sample);
+
+    /// Uniformly sample a vector on the unit sphere with respect to solid angles
+    static Point2f squareToTriangle(const Point2f &sample);
 
     /// Probability density of \ref squareToUniformSphere()
     static float squareToUniformSpherePdf(const Vector3f &v);
@@ -77,6 +84,18 @@ public:
 
     /// Probability density of \ref squareToBeckmann()
     static float squareToBeckmannPdf(const Vector3f &m, float alpha);
+
+    static float squareToHSWPDF(const Point2f &p, HSWrapper *testWrapper);
+    static Point2f squareToHSW(const Point2f &sample, HSWrapper *testWrapper);
+
+    static float squareToHenyeyGreensteinPDF(const Vector3f &p, float g);
+    static float squareToHenyeyGreensteinPDF(const Vector3f &wo, const Vector3f &wi, float g);
+    static Vector3f squareToHenyeyGreenstein(const Point2f &sample, float g);
+
+    static Vector3f squareToSchlick(const Point2f &sample, float k);
+    static float squareToSchlickPDF(const Vector3f &wo, const Vector3f &wi, float k);
+    static float squareToSchlickPDF(const Vector3f &p, float g);
+
 };
 
 NORI_NAMESPACE_END

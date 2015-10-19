@@ -22,6 +22,9 @@
 #include <nori/object.h>
 #include <nori/frame.h>
 #include <nori/bbox.h>
+#include <nori/dpdf.h>
+#include <nori/texture.h>
+#include <nori/bumpTexture.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -92,6 +95,14 @@ public:
      */
     void samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const;
 
+    /**
+     * @brief Pdf get the PDF of a sample in a direction
+     * @param Point3f the sample
+     * @param wi the direction
+     * @return the PDF value
+     */
+    float Pdf(const Point3f &p, const Point3f &hitP, const Normal3f &n, const Vector3f &wi) const;
+
     /// Return the surface area of the given triangle
     float surfaceArea(uint32_t index) const;
 
@@ -146,11 +157,23 @@ public:
     /// Is this mesh an area emitter?
     bool isEmitter() const { return m_emitter != nullptr; }
 
+    /// has the mesh a texture?
+    bool hasTexture() const { return m_texture != nullptr; }
+
+    /// Is this mesh a bumpmap?
+    bool hasBumpMap() const { return m_bumpmap != nullptr; }
+
     /// Return a pointer to an attached area emitter instance
     Emitter *getEmitter() { return m_emitter; }
 
     /// Return a pointer to an attached area emitter instance (const version)
     const Emitter *getEmitter() const { return m_emitter; }
+
+    /// Return a pointer to an attached texture instance (const version)
+    const Texture *getTexture() const { return m_texture; }
+
+    /// Return a pointer to an attached bump map instance (const version)
+    const BumpTexture *getBumpmap() const { return m_bumpmap; }
 
     /// Return a pointer to the BSDF associated with this mesh
     const BSDF *getBSDF() const { return m_bsdf; }
@@ -170,6 +193,9 @@ public:
      * */
     EClassType getClassType() const { return EMesh; }
 
+    float  m_surfaceArea = 0.0;          ///< Area of the whole surface
+
+
 protected:
     /// Create an empty mesh
     Mesh();
@@ -183,6 +209,12 @@ protected:
     BSDF         *m_bsdf = nullptr;      ///< BSDF of the surface
     Emitter    *m_emitter = nullptr;     ///< Associated emitter, if any
     BoundingBox3f m_bbox;                ///< Bounding box of the mesh
+    DiscretePDF *m_dpdf = nullptr;       ///< PDF of the emitter
+    Texture *m_texture = nullptr;        ///< texture of the mesh
+    BumpTexture *m_bumpmap = nullptr;    ///< bumpmap of the mesh
+
+
+
 };
 
 NORI_NAMESPACE_END

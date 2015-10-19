@@ -29,6 +29,8 @@ struct PhotonData {
     uint8_t rgbe[4];        //!< Photon power stored in Greg Ward's RGBE format
     uint8_t theta;            //!< Discretized photon direction (\a theta component)
     uint8_t phi;            //!< Discretized photon direction (\a phi component)
+    float discRadius = 0.0f;
+    BoundingBox3f boundingBox;
 
     /// Dummy constructor
     PhotonData() { }
@@ -84,6 +86,25 @@ public:
     
     Vector3f getDirection() const { return data.getDirection(); }
     Color3f getPower() const { return data.getPower(); }
+    void setRadius(float rad) {
+        data.discRadius = rad;
+        //set the current Bounding box
+        Point3f BBMIN = Point3f(-rad, -rad, -rad) + getPosition();
+        Point3f BBMAX = Point3f(rad, rad, rad) + getPosition();
+        data.boundingBox = BoundingBox3f(BBMIN, BBMAX);
+    }
+
+    float getRadius() const {return data.discRadius;}
+    void enlargeBB(const BoundingBox3f &newBB){
+        data.boundingBox.expandBy(newBB);
+    }
+    const BoundingBox3f getBB() const{
+        return data.boundingBox;
+    }
+    bool rayBBIntersect(const Ray3f &ray) const {
+        return data.boundingBox.rayIntersect(ray);
+    }
+
 };
 
 NORI_NAMESPACE_END

@@ -59,8 +59,13 @@ NoriObject *loadFromXML(const std::string &filename) {
         EScene                = NoriObject::EScene,
         EMesh                 = NoriObject::EMesh,
         EBSDF                 = NoriObject::EBSDF,
+        ETEXTURE              = NoriObject::ETEXTURE,
+        EPERLIN               = NoriObject::EPERLIN,
+        EMIXTEXTURE           = NoriObject::EMIXTEXTURE,
+        EMIXBUMPMAP           = NoriObject::EMIXBUMPMAP,
+        EBUMPMAP              = NoriObject::EBUMPMAP,
         EPhaseFunction        = NoriObject::EPhaseFunction,
-        EEmitter            = NoriObject::EEmitter,
+        EEmitter              = NoriObject::EEmitter,
         EMedium               = NoriObject::EMedium,
         ECamera               = NoriObject::ECamera,
         EIntegrator           = NoriObject::EIntegrator,
@@ -91,7 +96,13 @@ NoriObject *loadFromXML(const std::string &filename) {
     tags["scene"]      = EScene;
     tags["mesh"]       = EMesh;
     tags["bsdf"]       = EBSDF;
-    tags["emitter"]  = EEmitter;
+    tags["texture"]    = ETEXTURE;
+    tags["bumpmap"]    = EBUMPMAP;
+    tags["perlin"]     = EPERLIN;
+    tags["mixTexture"] = EMIXTEXTURE;
+    tags["mixBumpmap"] = EMIXBUMPMAP;
+    tags["bumpmap"]    = EBUMPMAP;
+    tags["emitter"]    = EEmitter;
     tags["camera"]     = ECamera;
     tags["medium"]     = EMedium;
     tags["phase"]      = EPhaseFunction;
@@ -290,8 +301,8 @@ NoriObject *loadFromXML(const std::string &filename) {
                             Eigen::Vector3f up = toVector3f(node.attribute("up").value());
 
                             Vector3f dir = (target - origin).normalized();
-                            Vector3f left = up.normalized().cross(dir).normalized();
-                            Vector3f newUp = dir.cross(left).normalized();
+                            Vector3f left = up.normalized().cross(dir);
+                            Vector3f newUp = dir.cross(left);
 
                             Eigen::Matrix4f trafo;
                             trafo << left, newUp, dir, origin,

@@ -20,6 +20,8 @@
 #define __NORI_KDTREE_H
 
 #include <nori/bbox.h>
+#include <stack>
+#include <utility>
 
 NORI_NAMESPACE_BEGIN
 
@@ -249,6 +251,95 @@ public:
 
         cout << "done." << endl;
     }
+    /**
+     * @brief estimateRadius set the radius of the k-nn for every photon
+     */
+    void estimateRadius(size_t k){
+        cout << "Starting to set the K- nn  radius for each photon ...";
+        cout.flush();
+        SearchResult *dummy = (SearchResult *) alloca((k + 1) * sizeof(SearchResult));
+
+        for (unsigned int i = 0; i < size(); ++i) {
+            NodeType& ph = m_nodes[i];
+            float radius = std::numeric_limits<float>::infinity();
+            const PointType pos = ph.getPosition();
+            nnSearch(pos, radius, k, dummy);
+            radius = std::sqrt(radius);
+            ph.setRadius(radius);
+        }
+
+        cout << " done." << endl;
+        cout.flush();
+    }
+    void constructBBHRec(IndexType curr, NodeType *parent){
+        NodeType *node = &(m_nodes[curr]);
+        if(hasRightChild(curr))
+            constructBBHRec(node->getRightIndex(curr), node);
+        if(hasLeftChild(curr))
+            constructBBHRec(node->getLeftIndex(curr), node);
+        if(parent != nullptr){
+            const BoundingBoxType BB = node->getBB();
+            parent->enlargeBB(BB);
+        }
+    }
+
+    void constructBBH(){
+        if (m_nodes.size() == 0)
+            return;
+        cout << "creating the BBH ... ";
+        cout.flush();
+        IndexType root = 0;
+        NodeType *parent = nullptr;
+        constructBBHRec(root, parent);
+        cout << " done!" << endl;
+        cout.flush();
+    }
+
+    inline bool raySphereIntersect(const Ray3f &ray, const Vector3f &pos, const float &radius){
+        float a = ray.d.dot(ray.d);
+        Vector3f dist = 2.0f * (ray.o - pos);
+        float b = ray.d.dot(dist);
+        float c = pos.dot(pos) + ray.o.dot(ray.o) - 2.0f * ray.o.dot(pos) - radius * radius;
+        float D = b * b + (-4.0f) * a * c;
+
+        if(D < 0.0f) return false;
+
+        D = std::sqrt(D);
+        float t = (- 0.5f) * (b + D) / a;
+
+        if(ray.mint < t && t < ray.maxt) return true;
+
+        return false;
+    }
+
+    // go to the right
+    void gatherPhotons(const Ray3f &ray, std::vector<IndexType> &results){
+        if (m_nodes.size() == 0)
+            return;
+
+        std::stack<IndexType> stack;
+        stack.push(0);
+        while (!stack.empty()) {
+            IndexType curr = stack.top();
+            stack.pop();
+            const NodeType &node = m_nodes[curr];
+            if(node.rayBBIntersect(ray)){
+                if(raySphereIntersect(ray, node.getPosition(), node.getRadius())){
+                    results.push_back(curr);
+                }
+
+                if(hasRightChild(curr)){
+                    stack.push(node.getRightIndex(curr));
+                }
+
+                if(hasLeftChild(curr)){
+                    stack.push(node.getLeftIndex(curr));
+                }
+            }
+        }
+    }
+
+
 
     /**
      * \brief Run a search query
@@ -378,6 +469,7 @@ public:
             }
 
             /* Check if the current point is within the query's search radius */
+            //const float pointDistSquared = (node.getPosition() - p).lengthSquared();
             const float pointDistSquared = (node.getPosition() - p).squaredNorm();
 
             if (pointDistSquared < sqrSearchRadius) {
@@ -438,6 +530,10 @@ protected:
     bool hasRightChild(IndexType index) const {
         return m_nodes[index].getRightIndex(index) != 0;
     }
+    bool hasLeftChild(IndexType index) const {
+        return !m_nodes[index].isLeaf();
+    }
+
 
     /// Tree construction routine
     void build(size_t depth,

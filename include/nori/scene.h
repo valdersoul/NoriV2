@@ -20,6 +20,7 @@
 #define __NORI_SCENE_H
 
 #include <nori/bvh.h>
+#include <nori/volume.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -53,11 +54,21 @@ public:
     /// Return a pointer to the scene's sample generator (const version)
     const Sampler *getSampler() const { return m_sampler; }
 
+    /// Return a pointer to the scene's m_distantDiskLight
+    Emitter *getDistantEmitter() const { return m_distantEmitter; }
+
+
     /// Return a pointer to the scene's sample generator
     Sampler *getSampler() { return m_sampler; }
 
     /// Return a reference to an array containing all meshes
     const std::vector<Mesh *> &getMeshes() const { return m_meshes; }
+
+    /// Return a reference to an array containing all emitters
+    const std::vector<Emitter *> &getEmitters() const { return m_emitters; }
+
+    /// Return a reference to an array containing all volumes
+    const std::vector<Volume *> &getVolumes() const { return m_volumes; }
 
     /**
      * \brief Intersect a ray against all triangles stored in the scene
@@ -121,10 +132,13 @@ public:
     EClassType getClassType() const { return EScene; }
 private:
     std::vector<Mesh *> m_meshes;
+    std::vector<Emitter *> m_emitters;
+    std::vector<Volume *> m_volumes;
     Integrator *m_integrator = nullptr;
     Sampler *m_sampler = nullptr;
     Camera *m_camera = nullptr;
     BVH *m_bvh = nullptr;
+    Emitter *m_distantEmitter = nullptr;
 };
 
 NORI_NAMESPACE_END

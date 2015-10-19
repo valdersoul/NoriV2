@@ -286,8 +286,10 @@ float fresnel(float cosThetaI, float extIOR, float intIOR) {
     float eta = etaI / etaT,
           sinThetaTSqr = eta*eta * (1-cosThetaI*cosThetaI);
 
-    if (sinThetaTSqr > 1.0f)
+    if (sinThetaTSqr > 1.0f){
+        //cout << "Total internal reflection" << endl;
         return 1.0f;  /* Total internal reflection! */
+    }
 
     float cosThetaT = std::sqrt(1.0f - sinThetaTSqr);
 

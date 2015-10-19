@@ -18,6 +18,7 @@
 
 #include <nori/warp.h>
 #include <nori/bsdf.h>
+#include <nori/bitmap.h>
 #include <nanogui/screen.h>
 #include <nanogui/glutil.h>
 #include <nanogui/label.h>
@@ -63,24 +64,36 @@ public:
 
     enum WarpType {
         None = 0,
-        Disk,
+        Disk,        
         UniformSphere,
         UniformSphereCap,
         UniformHemisphere,
         CosineHemisphere,
         Beckmann,
-        MicrofacetBRDF
+        MicrofacetBRDF,
+        HSW,
+        HenyeyGreenstein,
+        Schlick
     };
 
     WarpTest(): Screen(Vector2i(800, 600), "Assignment 2: Sampling and Warping"), m_bRec(Vector3f()) {
         initializeGUI();
         m_drawHistogram = false;
+        std::string filePath = "../scenes/project/images/lightprobe2.exr";
+        lightProb = new nori::Bitmap(filePath);
+        testWrapper = new nori::HSWrapper(*lightProb);
     }
 
     static float mapParameter(WarpType warpType, float parameterValue) {
         if (warpType == Beckmann || warpType == MicrofacetBRDF)
             parameterValue = std::exp(std::log(0.05f) * (1 - parameterValue) +
                                       std::log(1.f)   *  parameterValue);
+        if (warpType == HenyeyGreenstein)
+            parameterValue = 2.0f * parameterValue - 1.0f;
+        if (warpType == Schlick){
+            parameterValue = 2.0f * parameterValue - 1.0f;
+            parameterValue = 1.55f * parameterValue - 0.55 * parameterValue * parameterValue * parameterValue;
+        }
         return parameterValue;
     }
 
@@ -95,6 +108,9 @@ public:
             case UniformHemisphere: result << Warp::squareToUniformHemisphere(sample); break;
             case CosineHemisphere: result << Warp::squareToCosineHemisphere(sample); break;
             case Beckmann: result << Warp::squareToBeckmann(sample, parameterValue); break;
+            case HenyeyGreenstein: result << Warp::squareToHenyeyGreenstein(sample, parameterValue); break;
+            case Schlick: result << Warp::squareToSchlick(sample, parameterValue); break;
+            case HSW: result << Warp::squareToHSW(sample, testWrapper), 0; break;
             case MicrofacetBRDF: {
                 BSDFQueryRecord bRec(m_bRec);
                 float value = m_brdf->sample(bRec, sample).getLuminance();
@@ -260,8 +276,8 @@ public:
         m_pointCountBox->setValue(str);
         m_parameterBox->setValue(tfm::format("%.1g", parameterValue));
         m_angleBox->setValue(tfm::format("%.1f", m_angleSlider->value() * 180-90));
-        m_parameterSlider->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
-        m_parameterBox->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
+        m_parameterSlider->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap || warpType == HenyeyGreenstein || warpType == Schlick);
+        m_parameterBox->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap || warpType == HenyeyGreenstein || warpType == Schlick);
         m_angleBox->setEnabled(warpType == MicrofacetBRDF);
         m_angleSlider->setEnabled(warpType == MicrofacetBRDF);
         m_parameterBox->setEnabled(warpType == MicrofacetBRDF);
@@ -275,6 +291,8 @@ public:
         delete m_gridShader;
         delete m_arrowShader;
         delete m_histogramShader;
+        delete testWrapper;
+        delete lightProb;
     }
 
     void framebufferSizeChanged() {
@@ -426,6 +444,9 @@ public:
             } else if (warpType == Disk) {
                 x = sample.x() * 0.5f + 0.5f;
                 y = sample.y() * 0.5f + 0.5f;
+            } else if (warpType == HSW) {
+                x = sample.x();
+                y = sample.y();
             } else {
                 x = std::atan2(sample.y(), sample.x()) * INV_TWOPI;
                 if (x < 0)
@@ -444,6 +465,8 @@ public:
             } else if (warpType == Disk) {
                 x = x * 2 - 1; y = y * 2 - 1;
                 return Warp::squareToUniformDiskPdf(Point2f(x, y));
+            } else if (warpType == HSW) {
+                return Warp::squareToHSWPDF(Point2f(x, y), testWrapper);
             } else {
                 x *= 2 * M_PI;
                 y = y * 2 - 1;
@@ -466,6 +489,10 @@ public:
                     return Warp::squareToCosineHemispherePdf(v);
                 else if (warpType == Beckmann)
                     return Warp::squareToBeckmannPdf(v, parameterValue);
+                else if (warpType == HenyeyGreenstein)
+                    return Warp::squareToHenyeyGreensteinPDF(v, parameterValue);
+                else if (warpType == Schlick)
+                    return Warp::squareToSchlickPDF(v, parameterValue);
                 else if (warpType == MicrofacetBRDF) {
                     BSDFQueryRecord bRec(m_bRec);
                     bRec.wo = v;
@@ -482,6 +509,8 @@ public:
             scale *= 1;
         else if (warpType == Disk)
             scale *= 4;
+        else if (warpType == HSW)
+            scale *= lightProb->rows() * lightProb->cols();
         else
             scale *= 4*M_PI;
 
@@ -494,6 +523,7 @@ public:
                 double xEnd   = (x+1) / (double) xres;
                 ptr[y * xres + x] = hypothesis::adaptiveSimpson2D(
                     integrand, yStart, xStart, yEnd, xEnd) * scale;
+                //cout << "scaled pdf = " << ptr[y * xres + x] << endl;
                 if (ptr[y * xres + x] < 0)
                     throw NoriException("The Pdf() function returned negative values!");
             }
@@ -560,7 +590,7 @@ public:
 
         new Label(m_window, "Warping method", "sans-bold");
         m_warpTypeBox = new ComboBox(m_window, { "None", "Disk", "Sphere", "Spherical cap", "Hemisphere (unif.)",
-                "Hemisphere (cos)", "Beckmann distr.", "Microfacet BRDF" });
+                "Hemisphere (cos)", "Beckmann distr.", "Microfacet BRDF" , "HSW", "Henyey Greenstein", "Schlick"});
         m_warpTypeBox->setCallback([&](int) { refresh(); });
 
         panel = new Widget(m_window);
@@ -771,6 +801,8 @@ private:
     std::unique_ptr<BSDF> m_brdf;
     BSDFQueryRecord m_bRec;
     std::pair<bool, std::string> m_testResult;
+    nori::HSWrapper *testWrapper = nullptr;
+    nori::Bitmap *lightProb = nullptr;
 };
 
 int main(int argc, char **argv) {

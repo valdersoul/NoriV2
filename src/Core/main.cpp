@@ -29,8 +29,10 @@
 #include <tbb/blocked_range.h>
 #include <filesystem/resolver.h>
 #include <thread>
+#include <tbb/task_scheduler_init.h>
 
 using namespace nori;
+
 
 static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block) {
     const Camera *camera = scene->getCamera();
@@ -63,10 +65,11 @@ static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block)
     }
 }
 
-static void render(Scene *scene, const std::string &filename) {
+static void render(Scene *scene, const std::string &filename, const int nrThreads, const bool showWindow) {
     const Camera *camera = scene->getCamera();
     Vector2i outputSize = camera->getOutputSize();
     scene->getIntegrator()->preprocess(scene);
+    NoriScreen *screen = nullptr;
 
     /* Create a block generator (i.e. a work scheduler) */
     BlockGenerator blockGenerator(outputSize, NORI_BLOCK_SIZE);
@@ -76,15 +79,21 @@ static void render(Scene *scene, const std::string &filename) {
     result.clear();
 
     /* Create a window that visualizes the partially rendered result */
-    nanogui::init();
-    NoriScreen *screen = new NoriScreen(result);
+    if (showWindow) {
+        nanogui::init();
+        screen = new NoriScreen(result);
+    }
 
     /* Do the following in parallel and asynchronously */
+
+
     std::thread render_thread([&] {
         cout << "Rendering .. ";
         cout.flush();
         Timer timer;
 
+
+        tbb::task_scheduler_init init(nrThreads);
         tbb::blocked_range<int> range(0, blockGenerator.getBlockCount());
 
         auto map = [&](const tbb::blocked_range<int> &range) {
@@ -120,15 +129,18 @@ static void render(Scene *scene, const std::string &filename) {
 
         cout << "done. (took " << timer.elapsedString() << ")" << endl;
     });
-
-    /* Enter the application main loop */
-    nanogui::mainloop();
+    if(showWindow) {
+        /* Enter the application main loop */
+        nanogui::mainloop();
+    }
 
     /* Shut down the user interface */
     render_thread.join();
 
-    delete screen;
-    nanogui::shutdown();
+    if(showWindow) {
+        delete screen;
+        nanogui::shutdown();
+    }
 
     /* Now turn the rendered image block into
        a properly normalized bitmap */
@@ -146,8 +158,8 @@ static void render(Scene *scene, const std::string &filename) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        cerr << "Syntax: " << argv[0] << " <scene.xml>" << endl;
+    if (argc < 2 || argc > 4) {
+        cerr << "Syntax: " << argv[0] << " <scene.xml> [number of threads] [show window (0|1)]" << endl;
         return -1;
     }
 
@@ -161,10 +173,21 @@ int main(int argc, char **argv) {
             getFileResolver()->prepend(path.parent_path());
 
             std::unique_ptr<NoriObject> root(loadFromXML(argv[1]));
+            int numberOfThreads = 0;
+            bool showWindow = true;
+            if(argc > 2){
+                numberOfThreads = std::atoi(argv[2]);
 
+            }
+            if (argc > 3) {
+                if(std::atoi(argv[3]) == 0) {
+                    showWindow = false;
+                }
+            }
             /* When the XML root object is a scene, start rendering it .. */
-            if (root->getClassType() == NoriObject::EScene)
-                render(static_cast<Scene *>(root.get()), argv[1]);
+            if (root->getClassType() == NoriObject::EScene) {
+                render(static_cast<Scene *>(root.get()), argv[1], numberOfThreads, showWindow);
+            }
         } else if (path.extension() == "exr") {
             /* Alternatively, provide a basic OpenEXR image viewer */
             Bitmap bitmap(argv[1]);

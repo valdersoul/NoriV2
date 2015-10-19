@@ -484,19 +484,26 @@ bool BVH::rayIntersect(const Ray3f &_ray, Intersection &its, bool shadowRay) con
         /* Compute the geometry frame */
         its.geoFrame = Frame((p1-p0).cross(p2-p0).normalized());
 
-        if (N.size() > 0) {
-            /* Compute the shading frame. Note that for simplicity,
-               the current implementation doesn't attempt to provide
-               tangents that are continuous across the surface. That
-               means that this code will need to be modified to be able
-               use anisotropic BRDFs, which need tangent continuity */
-
-            its.shFrame = Frame(
-                (bary.x() * N.col(idx0) +
-                 bary.y() * N.col(idx1) +
-                 bary.z() * N.col(idx2)).normalized());
+        if(its.mesh->hasBumpMap()){
+            const BumpTexture *curBM = its.mesh->getBumpmap();
+            Normal3f N(0.0f);
+            curBM->getNormalTangentSpace(its.uv, N);
+            its.shFrame = Frame(N);
         } else {
-            its.shFrame = its.geoFrame;
+            if (N.size() > 0) {
+                /* Compute the shading frame. Note that for simplicity,
+                   the current implementation doesn't attempt to provide
+                   tangents that are continuous across the surface. That
+                   means that this code will need to be modified to be able
+                   use anisotropic BRDFs, which need tangent continuity */
+
+                its.shFrame = Frame(
+                    (bary.x() * N.col(idx0) +
+                     bary.y() * N.col(idx1) +
+                     bary.z() * N.col(idx2)).normalized());
+            } else {
+                its.shFrame = its.geoFrame;
+            }
         }
     }
 

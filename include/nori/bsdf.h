@@ -37,6 +37,10 @@ struct BSDFQueryRecord {
     /// Relative refractive index in the sampled direction
     float eta;
 
+    //TODO SOMETIME pdf of the query
+    //float pdf;
+    bool entering = false;
+
     /// Measure associated with the sample
     EMeasure measure;
 
@@ -111,6 +115,11 @@ public:
      * or not to store photons on a surface
      */
     virtual bool isDiffuse() const { return false; }
+
+    /**
+     * \brief Return whether or not this BRDF is a delta bsf
+     */
+    virtual bool isDeltaBSDF() const { return false; }
 };
 
 NORI_NAMESPACE_END

@@ -73,6 +73,8 @@ Bitmap::Bitmap(const std::string &filename) {
     frameBuffer.insert(ch_b, Imf::Slice(Imf::FLOAT, ptr, pixelStride, rowStride)); 
     file.setFrameBuffer(frameBuffer);
     file.readPixels(dw.min.y, dw.max.y);
+
+    m_totalLuminance = getTotalLuminace();
 }
 
 void Bitmap::save(const std::string &filename) {
@@ -101,5 +103,12 @@ void Bitmap::save(const std::string &filename) {
     file.setFrameBuffer(frameBuffer);
     file.writePixels((int) rows());
 }
+float Bitmap::getTotalLuminace(){
+    Color3f totalColor = sum();
+
+    float totalLum = totalColor.getLuminance();
+    return totalLum;
+}
+
 
 NORI_NAMESPACE_END

@@ -43,7 +43,50 @@ public:
     }
 
     Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample) const {
-        throw NoriException("Unimplemented!");
+
+        bRec.measure = EDiscrete;
+
+        //check if your are inside or not
+        //compute the angle between the normal and the incoming direction
+        float theta1 = Frame::cosTheta(bRec.wi);
+
+        float fresnelTerm = fresnel(theta1, m_extIOR, m_intIOR);
+
+        //check if entering or leaving
+        bRec.entering = (theta1 > 0);
+
+
+        float et = m_extIOR;
+        float ei = m_intIOR;
+        Vector3f n = Vector3f(0.0, 0.0, 1.0);
+        if(!bRec.entering) {
+             std::swap(ei, et);
+             n(2) = -1.0;
+        }
+
+
+        // check you should a reflection or refraction
+        if(sample(0) < fresnelTerm) {
+            //mirror like reflection
+            bRec.wo = Vector3f(
+                -bRec.wi.x(),
+                -bRec.wi.y(),
+                 bRec.wi.z()
+            );
+            bRec.eta = 1.0f;
+        } else {
+            float snellsTerm = et / ei;
+
+            float wdotn = bRec.wi.dot(n);
+
+            Vector3f fstPart = (bRec.wi - (wdotn) * n);
+            float srqtTerm = std::sqrt(1.0f - snellsTerm * snellsTerm * (1.0f - wdotn * wdotn));
+
+            bRec.wo = - snellsTerm * fstPart - n * srqtTerm;
+            bRec.eta = bRec.entering?  m_intIOR / m_extIOR : m_extIOR / m_intIOR;
+        }
+
+        return Color3f(1.0f);
     }
 
     std::string toString() const {
@@ -53,6 +96,10 @@ public:
             "  extIOR = %f\n"
             "]",
             m_intIOR, m_extIOR);
+    }
+
+    bool isDeltaBSDF() const {
+        return true;
     }
 private:
     float m_intIOR, m_extIOR;

@@ -35,6 +35,11 @@ public:
         EScene = 0,
         EMesh,
         EBSDF,
+        ETEXTURE,
+        EBUMPMAP,
+        EPERLIN,
+        EMIXTEXTURE,
+        EMIXBUMPMAP,
         EPhaseFunction,
         EEmitter,
         EMedium,
@@ -94,7 +99,12 @@ public:
             case EScene:      return "scene";
             case EMesh:       return "mesh";
             case EBSDF:       return "bsdf";
+            case ETEXTURE:    return "texture";
+            case EBUMPMAP:    return "bumpmap";
             case EEmitter:    return "emitter";
+            case EPERLIN:     return "perlin";
+            case EMIXTEXTURE: return "mixTexture";
+            case EMIXBUMPMAP: return "mixBumpmap";
             case ECamera:     return "camera";
             case EIntegrator: return "integrator";
             case ESampler:    return "sampler";

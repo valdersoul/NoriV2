@@ -57,6 +57,9 @@ public:
     std::string toString() const {
         return "Mirror[]";
     }
+    bool isDeltaBSDF() const {
+        return true;
+    }
 };
 
 NORI_REGISTER_CLASS(Mirror, "mirror");

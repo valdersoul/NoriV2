@@ -20,6 +20,7 @@
 #define __NORI_COLOR_H
 
 #include <nori/common.h>
+#include <math.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -74,6 +75,10 @@ public:
 
     /// Return the associated luminance
     float getLuminance() const;
+
+    Color3f expElemwise() const {
+        return Color3f(expf(r()), expf(g()), expf(b()));
+    }
 
     /// Return a human-readable string summary
     std::string toString() const {

@@ -82,6 +82,15 @@ template <typename _PointType> struct TBoundingBox {
     Scalar getVolume() const {
         return (max - min).prod();
     }
+    //get the longest direction
+    float getLongestDirection() const {
+        float maxDir = 0.0f;
+        for (int i = 0; i < 3; ++i) {
+            maxDir = std::max(maxDir, std::abs(max(i)));
+            maxDir = std::max(maxDir, std::abs(min(i)));
+        }
+        return maxDir;
+    }
 
     /// Calculate the n-1 dimensional volume of the boundary
     float getSurfaceArea() const {
