@@ -62,7 +62,7 @@ public:
 
         // check if the reflection vector is the same as the incoming vector
         // take rounding errors into account
-        if(reflectionVec.dot(bRec.wo) - 1.0f > Epsilon) {
+        if(std::abs(reflectionVec.dot(bRec.wo) - 1.0f) > DeltaEpsilon) {
             return Color3f(0.0f);
         }
 
@@ -81,7 +81,7 @@ public:
 
         // check if the reflection vector is the same as the incoming vector
         // take rounding errors into account
-        if(reflectionVec.dot(bRec.wo) - 1.0f > Epsilon) {
+        if(std::abs(reflectionVec.dot(bRec.wo) - 1.0f) > DeltaEpsilon) {
             return 1.0f;
         }
 

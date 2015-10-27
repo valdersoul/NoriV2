@@ -51,12 +51,14 @@ add_executable(nori
   include/nori/transform.h
   include/nori/vector.h
   include/nori/warp.h
+  include/nori/microfacet.h
 
   # Source code files
 
   # BSDFS
   src/BSDFs/diffuse.cpp
   src/BSDFs/microfacet.cpp
+  src/BSDFs/microfacetBRDF.cpp
   src/BSDFs/mirror.cpp
   src/BSDFs/dielectric.cpp
   src/BSDFs/conductor.cpp
