@@ -19,13 +19,14 @@
 #include <nori/bsdf.h>
 #include <nori/frame.h>
 #include <nori/metalConsts.h>
+#include <nori/warp.h>
 
 NORI_NAMESPACE_BEGIN
 
-/// Ideal Conductor BRDF
-class Conductor : public BSDF {
+/// Ideal RoughConductor BRDF
+class RoughConductor : public BSDF {
 public:
-    Conductor(const PropertyList &propList) {
+    RoughConductor(const PropertyList &propList) {
         materialName = propList.getString("materialName", "");
 
         if(materialName != "") {
@@ -37,6 +38,9 @@ public:
             m_eta = propList.getColor("eta");
             m_k = propList.getColor("k");
         }
+
+        /* RMS surface roughness */
+        m_alpha = propList.getFloat("alpha", 0.1f);
     }
 
     Color3f fresnelCond(const float cosTheta) const {
@@ -48,25 +52,15 @@ public:
             );
     }
 
+
     Color3f eval(const BSDFQueryRecord &bRec) const {
         /* Discrete BRDFs always evaluate to zero in Nori */
-        /* This is a smooth BRDF -- return zero if the measure
-           is wrong, or when queried for illumination on the backside */
         if (bRec.measure != ESolidAngle
             || Frame::cosTheta(bRec.wi) <= 0
             || Frame::cosTheta(bRec.wo) <= 0)
-            return Color3f(0.0f);
+            return 0.0f;
 
-        // check if the given vector pair is a perfect reflection
-        Vector3f reflectionVec = Vector3f(-bRec.wi.x(), -bRec.wi.y(), bRec.wi.z());
-
-        // check if the reflection vector is the same as the incoming vector
-        // take rounding errors into account
-        if(reflectionVec.dot(bRec.wo) - 1.0f > Epsilon) {
-            return Color3f(0.0f);
-        }
-
-        return fresnelCond(Frame::cosTheta(bRec.wi));
+        return Color3f(0.0f);
     }
 
     float pdf(const BSDFQueryRecord &bRec) const {
@@ -76,44 +70,25 @@ public:
             || Frame::cosTheta(bRec.wo) <= 0)
             return 0.0f;
 
-        // check if the given vector pair is a perfect reflection
-        Vector3f reflectionVec = Vector3f(-bRec.wi.x(), -bRec.wi.y(), bRec.wi.z());
-
-        // check if the reflection vector is the same as the incoming vector
-        // take rounding errors into account
-        if(reflectionVec.dot(bRec.wo) - 1.0f > Epsilon) {
-            return 1.0f;
-        }
-
-        return 1.0f;
+        return 0.0f;
     }
 
     Color3f sample(BSDFQueryRecord &bRec, const Point2f &) const {
         if (Frame::cosTheta(bRec.wi) <= 0) 
             return Color3f(0.0f);
 
-        // Reflection in local coordinates
-        bRec.wo = Vector3f(
-            -bRec.wi.x(),
-            -bRec.wi.y(),
-             bRec.wi.z()
-        );
-        bRec.measure = EDiscrete;
-
-        /* Relative index of refraction: no change */
-        bRec.eta = 1.0f;
-
-        return fresnelCond(Frame::cosTheta(bRec.wi));
+        return Color3f(0.0f);
     }
 
     std::string toString() const {
         return tfm::format(
-                    "conductor[\n"
+                    "RoughConductor[\n"
                     "  material = %s,\n"
                     "  m_eta = %f,\n"
-                    "  m_k = %f\n"
+                    "  m_k = %f\n",
+                    "  m_alpha = %f,\n"
                     "]",
-                    materialName, m_eta, m_k);
+                    materialName, m_eta, m_k, m_alpha);
     }
     bool isDeltaBSDF() const {
         return true;
@@ -125,7 +100,10 @@ private:
 
     // index of absorbtion
     Color3f m_k;
+
+    // the roughness of the material
+    float m_alpha;
 };
 
-NORI_REGISTER_CLASS(Conductor, "conductor");
+NORI_REGISTER_CLASS(RoughConductor, "roughConductor");
 NORI_NAMESPACE_END

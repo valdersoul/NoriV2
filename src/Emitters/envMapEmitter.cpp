@@ -113,8 +113,6 @@ public:
         } catch (const std::exception &e) {
             cerr << "Fatal error: " << e.what() << endl;
         }
-
-
     }
 
     ~EnvMap(){

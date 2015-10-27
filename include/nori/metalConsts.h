@@ -96,7 +96,7 @@ static const int materialConst = 40;
  * \return
  *     If the material was found.
  */
-bool getMaterialProperties(const std::string &name, Color3f &eta, Color3f &k){
+static bool getMaterialProperties(const std::string &name, Color3f &eta, Color3f &k){
     for (int i = 0; i < materialConst; ++i) {
         if (matrialList[i].name == name) {
             eta = matrialList[i].eta;

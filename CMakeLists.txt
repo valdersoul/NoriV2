@@ -60,6 +60,7 @@ add_executable(nori
   src/BSDFs/mirror.cpp
   src/BSDFs/dielectric.cpp
   src/BSDFs/conductor.cpp
+  src/BSDFs/roughconductor.cpp
 
   # Cameras
   src/Cameras/perspective.cpp
