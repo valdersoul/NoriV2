@@ -19,6 +19,7 @@ add_executable(nori
   include/nori/HSWrapper.h
   include/nori/phaseFunction.h
   include/nori/volume.h
+  include/nori/metalConsts.h
 
   include/nori/areaLight.h
   include/nori/bbox.h
@@ -58,6 +59,7 @@ add_executable(nori
   src/BSDFs/microfacet.cpp
   src/BSDFs/mirror.cpp
   src/BSDFs/dielectric.cpp
+  src/BSDFs/conductor.cpp
 
   # Cameras
   src/Cameras/perspective.cpp

@@ -301,4 +301,22 @@ float fresnel(float cosThetaI, float extIOR, float intIOR) {
     return (Rs * Rs + Rp * Rp) / 2.0f;
 }
 
+
+float conductorReflectance(float cosThetaI, float eta, float k){
+    float cosThetaISq = cosThetaI*cosThetaI;
+    float sinThetaISq = std::max(1.0f - cosThetaISq, 0.0f);
+    float sinThetaIQu = sinThetaISq*sinThetaISq;
+
+    float innerTerm = eta*eta - k*k - sinThetaISq;
+    float aSqPlusBSq = std::sqrt(std::max(innerTerm*innerTerm + 4.0f*eta*eta*k*k, 0.0f));
+    float a = std::sqrt(std::max((aSqPlusBSq + innerTerm)*0.5f, 0.0f));
+
+    float Rs = ((aSqPlusBSq + cosThetaISq) - (2.0f*a*cosThetaI))/
+               ((aSqPlusBSq + cosThetaISq) + (2.0f*a*cosThetaI));
+    float Rp = ((cosThetaISq*aSqPlusBSq + sinThetaIQu) - (2.0f*a*cosThetaI*sinThetaISq))/
+               ((cosThetaISq*aSqPlusBSq + sinThetaIQu) + (2.0f*a*cosThetaI*sinThetaISq));
+
+    return 0.5f*(Rs + Rs*Rp);
+}
+
 NORI_NAMESPACE_END
