@@ -20,6 +20,7 @@
 #include <nori/frame.h>
 #include <nori/metalConsts.h>
 #include <nori/warp.h>
+#include <nori/microfacet.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -60,7 +61,19 @@ public:
             || Frame::cosTheta(bRec.wo) <= 0)
             return 0.0f;
 
-        return Color3f(0.0f);
+        // get the Half-direction (mircosurface normal)
+        Vector3f hr = (bRec.wi + bRec.wo).normalized();
+
+        //compute the geometry term and the
+        float G = Microfacet::G(m_alpha, bRec.wi, bRec.wo, hr);
+        // compute the Microfacet Distribution Function
+        float D = Microfacet::D(m_alpha, hr);
+        float factor = (G * D) / (4.0f * Frame::cosTheta(bRec.wi));
+
+        // compute the color
+        Color3f F = fresnelCond(bRec.wi.dot(hr));
+
+        return F * factor;
     }
 
     float pdf(const BSDFQueryRecord &bRec) const {
@@ -70,28 +83,48 @@ public:
             || Frame::cosTheta(bRec.wo) <= 0)
             return 0.0f;
 
-        return 0.0f;
+        // get the Half-direction
+        Vector3f hr = (bRec.wi + bRec.wo).normalized();
+
+        return Microfacet::pdf(m_alpha, hr) / (4.0f * std::abs(hr.dot(bRec.wo)));
     }
 
-    Color3f sample(BSDFQueryRecord &bRec, const Point2f &) const {
+    Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample) const {
         if (Frame::cosTheta(bRec.wi) <= 0) 
             return Color3f(0.0f);
 
-        return Color3f(0.0f);
+        // sample the normal
+        Vector3f m = Microfacet::sample(m_alpha, sample);
+
+        //reflection based on the microfacet normal
+        float wiDotM = m.dot(bRec.wi);
+        bRec.wo = 2.0f * wiDotM * m - bRec.wi;
+
+        // check if on the backside
+        if (Frame::cosTheta(bRec.wo) <= 0)
+            return Color3f(0.0f);
+
+        // compute the return color
+        float G = Microfacet::G(m_alpha, bRec.wi, bRec.wo, m);
+        float D = Microfacet::D(m_alpha, m);
+
+        float factor = wiDotM * G * D / (Frame::cosTheta(bRec.wi) * Microfacet::D(m_alpha, m));
+        Color3f F = fresnelCond(wiDotM);
+
+        return F * factor;
     }
 
     std::string toString() const {
         return tfm::format(
                     "RoughConductor[\n"
                     "  material = %s,\n"
-                    "  m_eta = %f,\n"
-                    "  m_k = %f\n",
                     "  m_alpha = %f,\n"
                     "]",
-                    materialName, m_eta, m_k, m_alpha);
+                    materialName,
+                    m_alpha);
     }
     bool isDeltaBSDF() const {
-        return true;
+        return false;
     }
 private:
     std::string materialName;

@@ -35,7 +35,7 @@ float Microfacet::pdf(float alpha, const Vector3f &m){
     return Microfacet::D(alpha, m) * Frame::cosTheta(m);
 }
 
-Vector3f sample(float alpha, Vector2f xi){
+Vector3f Microfacet::sample(float alpha, Point2f xi){
     return Warp::squareToBeckmann(xi, alpha);
 }
 

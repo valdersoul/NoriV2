@@ -110,10 +110,10 @@ public:
         return tfm::format(
                     "conductor[\n"
                     "  material = %s,\n"
-                    "  m_eta = %f,\n"
-                    "  m_k = %f\n"
+                    "  m_eta = %s,\n"
+                    "  m_k = %s\n"
                     "]",
-                    materialName, m_eta, m_k);
+                    materialName, m_eta.toString(), m_k.toString());
     }
     bool isDeltaBSDF() const {
         return true;

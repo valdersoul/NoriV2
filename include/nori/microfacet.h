@@ -34,7 +34,7 @@ public:
     static float D(float alpha, const Vector3f &m);
     static float G(float alpha,const Vector3f &i, const Vector3f &o, const Vector3f &m);
     static float pdf(float alpha, const Vector3f &m);
-    static Vector3f sample(float alpha, Vector2f xi);
+    static Vector3f sample(float alpha, Point2f xi);
 private:
     static float G1(float alpha, const Vector3f &v, const Vector3f &m);
     static float CHIPlus(const float c);
