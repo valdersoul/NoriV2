@@ -65,7 +65,7 @@ static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block)
     }
 }
 
-static void render(Scene *scene, const std::string &filename, const int nrThreads, const bool showWindow) {
+static void render(Scene *scene, const std::string &filename, const int nrThreads, const bool showWindow, const bool saveEveryStep) {
     const Camera *camera = scene->getCamera();
     Vector2i outputSize = camera->getOutputSize();
     scene->getIntegrator()->preprocess(scene);
@@ -84,6 +84,13 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
         screen = new NoriScreen(result);
     }
 
+    /* Determine the filename of the output bitmap */
+    std::string outputName = filename;
+    size_t lastdot = outputName.find_last_of(".");
+    if (lastdot != std::string::npos)
+        outputName.erase(lastdot, std::string::npos);
+    outputName += ".exr";
+
     /* Do the following in parallel and asynchronously */
 
 
@@ -91,6 +98,7 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
         cout << "Rendering .. ";
         cout.flush();
         Timer timer;
+
 
 
         tbb::task_scheduler_init init(nrThreads);
@@ -101,6 +109,7 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                by the current thread */
             ImageBlock block(Vector2i(NORI_BLOCK_SIZE),
                 camera->getReconstructionFilter());
+
 
             /* Create a clone of the sampler for the current thread */
             std::unique_ptr<Sampler> sampler(scene->getSampler()->clone());
@@ -118,6 +127,12 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                 /* The image block has been processed. Now add it to
                    the "big" block that represents the entire image */
                 result.put(block);
+                if(saveEveryStep) {
+                    std::unique_ptr<Bitmap> bitmap(result.toBitmap());
+
+                    /* Save using the OpenEXR format */
+                    bitmap->save(outputName);
+                }
             }
         };
 
@@ -146,20 +161,13 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
        a properly normalized bitmap */
     std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
-    /* Determine the filename of the output bitmap */
-    std::string outputName = filename;
-    size_t lastdot = outputName.find_last_of(".");
-    if (lastdot != std::string::npos)
-        outputName.erase(lastdot, std::string::npos);
-    outputName += ".exr";
-
     /* Save using the OpenEXR format */
     bitmap->save(outputName);
 }
 
 int main(int argc, char **argv) {
-    if (argc < 2 || argc > 4) {
-        cerr << "Syntax: " << argv[0] << " <scene.xml> [number of threads] [show window (0|1)]" << endl;
+    if (argc < 2 || argc > 5) {
+        cerr << "Syntax: " << argv[0] << " <scene.xml> [number of threads] [show window (0|1)] [save every image (0|1)]" << endl;
         return -1;
     }
 
@@ -175,6 +183,7 @@ int main(int argc, char **argv) {
             std::unique_ptr<NoriObject> root(loadFromXML(argv[1]));
             int numberOfThreads = 0;
             bool showWindow = true;
+            bool saveEveryImage = false;
             if(argc > 2){
                 numberOfThreads = std::atoi(argv[2]);
 
@@ -184,9 +193,14 @@ int main(int argc, char **argv) {
                     showWindow = false;
                 }
             }
+            if (argc > 4) {
+                if(std::atoi(argv[4]) == 1) {
+                    saveEveryImage = true;
+                }
+            }
             /* When the XML root object is a scene, start rendering it .. */
             if (root->getClassType() == NoriObject::EScene) {
-                render(static_cast<Scene *>(root.get()), argv[1], numberOfThreads, showWindow);
+                render(static_cast<Scene *>(root.get()), argv[1], numberOfThreads, showWindow, saveEveryImage);
             }
         } else if (path.extension() == "exr") {
             /* Alternatively, provide a basic OpenEXR image viewer */
