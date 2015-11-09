@@ -168,6 +168,7 @@ find_package(ImageMagick COMPONENTS Magick++)
 if (ImageMagick_FOUND)
     include_directories(${ImageMagick_INCLUDE_DIRS})
     target_link_libraries (nori ${ImageMagick_LIBRARIES})
+    target_link_libraries (warptest ${ImageMagick_LIBRARIES})
     MESSAGE( STATUS "ImageMagick found!")
 endif (ImageMagick_FOUND)
 

@@ -30,6 +30,7 @@
 #include <filesystem/resolver.h>
 #include <thread>
 #include <tbb/task_scheduler_init.h>
+#include <stdlib.h>
 
 using namespace nori;
 
@@ -86,10 +87,14 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
 
     /* Determine the filename of the output bitmap */
     std::string outputName = filename;
+    std::string outputNamePNG = filename;
     size_t lastdot = outputName.find_last_of(".");
-    if (lastdot != std::string::npos)
+    if (lastdot != std::string::npos) {
         outputName.erase(lastdot, std::string::npos);
+        outputNamePNG.erase(lastdot, std::string::npos);
+    }
     outputName += ".exr";
+    outputNamePNG += ".png";
 
     /* Do the following in parallel and asynchronously */
 
@@ -131,7 +136,7 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                     std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
                     /* Save using the OpenEXR format */
-                    bitmap->save(outputName);
+                    bitmap->savePNG(outputNamePNG);
                 }
             }
         };
@@ -184,17 +189,18 @@ int main(int argc, char **argv) {
             int numberOfThreads = 0;
             bool showWindow = true;
             bool saveEveryImage = false;
+            char *endptr;
             if(argc > 2){
-                numberOfThreads = std::atoi(argv[2]);
+                numberOfThreads = int(std::strtol(argv[2], &endptr, 10));
 
             }
             if (argc > 3) {
-                if(std::atoi(argv[3]) == 0) {
+                if(int(std::strtol(argv[3], &endptr, 10)) == 0) {
                     showWindow = false;
                 }
             }
             if (argc > 4) {
-                if(std::atoi(argv[4]) == 1) {
+                if(int(std::strtol(argv[4], &endptr, 10)) == 1) {
                     saveEveryImage = true;
                 }
             }

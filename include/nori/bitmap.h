@@ -48,6 +48,10 @@ public:
     /// Save the bitmap as an EXR file with the specified filename
     void save(const std::string &filename);
 
+    /// Save the bitmap as an PNG file with the specified filename
+    void savePNG(const std::string &filename);
+
+
     float getTotalLuminace();
 
     Bitmap(Eigen::Array<Color3f, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> other)
@@ -55,6 +59,7 @@ public:
 
 
     float m_totalLuminance = 0.0f;
+    float m_gamma = 2.2f;
 
 };
 
