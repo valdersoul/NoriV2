@@ -163,4 +163,12 @@ add_dependencies(warptest nori)
 target_link_libraries(nori ${extra_libs})
 target_link_libraries(warptest ${extra_libs})
 
+# find image magick++
+find_package(ImageMagick COMPONENTS Magick++)
+if (ImageMagick_FOUND)
+    include_directories(${ImageMagick_INCLUDE_DIRS})
+    target_link_libraries (nori ${ImageMagick_LIBRARIES})
+    MESSAGE( STATUS "ImageMagick found!")
+endif (ImageMagick_FOUND)
+
 # vim: set et ts=2 sw=2 ft=cmake nospell:
