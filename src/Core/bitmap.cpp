@@ -113,7 +113,6 @@ void Bitmap::savePNG(const std::string &filename) {
     // Allocate pixel view
     Magick::Pixels view(img);
 
-    Magick::Color green("green");
     Magick::PixelPacket *pixels = view.get(0, 0, cols(), rows());
 
     for ( ssize_t row = 0; row < rows() ; ++row )

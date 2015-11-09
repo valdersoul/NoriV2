@@ -1,0 +1,116 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <option name="myLocal" value="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="93">
+            <item index="0" class="java.lang.String" itemvalue="roslaunch" />
+            <item index="1" class="java.lang.String" itemvalue="qt-dotgraph" />
+            <item index="2" class="java.lang.String" itemvalue="pluginlib" />
+            <item index="3" class="java.lang.String" itemvalue="tf" />
+            <item index="4" class="java.lang.String" itemvalue="rqt-publisher" />
+            <item index="5" class="java.lang.String" itemvalue="image-geometry" />
+            <item index="6" class="java.lang.String" itemvalue="rqt-action" />
+            <item index="7" class="java.lang.String" itemvalue="rqt-topic" />
+            <item index="8" class="java.lang.String" itemvalue="rqt-py-common" />
+            <item index="9" class="java.lang.String" itemvalue="rqt-robot-steering" />
+            <item index="10" class="java.lang.String" itemvalue="rqt-shell" />
+            <item index="11" class="java.lang.String" itemvalue="roslint" />
+            <item index="12" class="java.lang.String" itemvalue="rostopic" />
+            <item index="13" class="java.lang.String" itemvalue="tf2-py" />
+            <item index="14" class="java.lang.String" itemvalue="rosboost-cfg" />
+            <item index="15" class="java.lang.String" itemvalue="rqt-bag" />
+            <item index="16" class="java.lang.String" itemvalue="tf2-sensor-msgs" />
+            <item index="17" class="java.lang.String" itemvalue="rqt-service-caller" />
+            <item index="18" class="java.lang.String" itemvalue="gencpp" />
+            <item index="19" class="java.lang.String" itemvalue="rqt-plot" />
+            <item index="20" class="java.lang.String" itemvalue="rosmsg" />
+            <item index="21" class="java.lang.String" itemvalue="rqt-bag-plugins" />
+            <item index="22" class="java.lang.String" itemvalue="qt-gui-py-common" />
+            <item index="23" class="java.lang.String" itemvalue="cv-bridge" />
+            <item index="24" class="java.lang.String" itemvalue="rqt-robot-monitor" />
+            <item index="25" class="java.lang.String" itemvalue="sensor-msgs" />
+            <item index="26" class="java.lang.String" itemvalue="tf-conversions" />
+            <item index="27" class="java.lang.String" itemvalue="rqt-msg" />
+            <item index="28" class="java.lang.String" itemvalue="smach" />
+            <item index="29" class="java.lang.String" itemvalue="rqt-top" />
+            <item index="30" class="java.lang.String" itemvalue="rosbag" />
+            <item index="31" class="java.lang.String" itemvalue="camera-calibration" />
+            <item index="32" class="java.lang.String" itemvalue="rqt-gui" />
+            <item index="33" class="java.lang.String" itemvalue="interactive-markers" />
+            <item index="34" class="java.lang.String" itemvalue="rqt-reconfigure" />
+            <item index="35" class="java.lang.String" itemvalue="diagnostic-analysis" />
+            <item index="36" class="java.lang.String" itemvalue="rosservice" />
+            <item index="37" class="java.lang.String" itemvalue="rqt-robot-dashboard" />
+            <item index="38" class="java.lang.String" itemvalue="rosnode" />
+            <item index="39" class="java.lang.String" itemvalue="resource-retriever" />
+            <item index="40" class="java.lang.String" itemvalue="smclib" />
+            <item index="41" class="java.lang.String" itemvalue="rospy" />
+            <item index="42" class="java.lang.String" itemvalue="rqt-logger-level" />
+            <item index="43" class="java.lang.String" itemvalue="rqt-dep" />
+            <item index="44" class="java.lang.String" itemvalue="genmsg" />
+            <item index="45" class="java.lang.String" itemvalue="genpy" />
+            <item index="46" class="java.lang.String" itemvalue="rqt-py-console" />
+            <item index="47" class="java.lang.String" itemvalue="rqt-runtime-monitor" />
+            <item index="48" class="java.lang.String" itemvalue="rosmaster" />
+            <item index="49" class="java.lang.String" itemvalue="rqt-tf-tree" />
+            <item index="50" class="java.lang.String" itemvalue="python-qt-binding" />
+            <item index="51" class="java.lang.String" itemvalue="rosunit" />
+            <item index="52" class="java.lang.String" itemvalue="diagnostic-common-diagnostics" />
+            <item index="53" class="java.lang.String" itemvalue="rostest" />
+            <item index="54" class="java.lang.String" itemvalue="rqt-nav-view" />
+            <item index="55" class="java.lang.String" itemvalue="rqt-image-view" />
+            <item index="56" class="java.lang.String" itemvalue="actionlib" />
+            <item index="57" class="java.lang.String" itemvalue="qt-gui" />
+            <item index="58" class="java.lang.String" itemvalue="message-filters" />
+            <item index="59" class="java.lang.String" itemvalue="diagnostic-updater" />
+            <item index="60" class="java.lang.String" itemvalue="rosclean" />
+            <item index="61" class="java.lang.String" itemvalue="tf2-geometry-msgs" />
+            <item index="62" class="java.lang.String" itemvalue="rqt-console" />
+            <item index="63" class="java.lang.String" itemvalue="roswtf" />
+            <item index="64" class="java.lang.String" itemvalue="dynamic-reconfigure" />
+            <item index="65" class="java.lang.String" itemvalue="roslz4" />
+            <item index="66" class="java.lang.String" itemvalue="rqt-web" />
+            <item index="67" class="java.lang.String" itemvalue="rqt-srv" />
+            <item index="68" class="java.lang.String" itemvalue="roscreate" />
+            <item index="69" class="java.lang.String" itemvalue="qt-gui-cpp" />
+            <item index="70" class="java.lang.String" itemvalue="laser-geometry" />
+            <item index="71" class="java.lang.String" itemvalue="roslib" />
+            <item index="72" class="java.lang.String" itemvalue="rqt-pose-view" />
+            <item index="73" class="java.lang.String" itemvalue="rqt-moveit" />
+            <item index="74" class="java.lang.String" itemvalue="rqt-graph" />
+            <item index="75" class="java.lang.String" itemvalue="bondpy" />
+            <item index="76" class="java.lang.String" itemvalue="genlisp" />
+            <item index="77" class="java.lang.String" itemvalue="smach-ros" />
+            <item index="78" class="java.lang.String" itemvalue="catkin" />
+            <item index="79" class="java.lang.String" itemvalue="rosmake" />
+            <item index="80" class="java.lang.String" itemvalue="rosparam" />
+            <item index="81" class="java.lang.String" itemvalue="rosgraph" />
+            <item index="82" class="java.lang.String" itemvalue="xacro" />
+            <item index="83" class="java.lang.String" itemvalue="tf2-ros" />
+            <item index="84" class="java.lang.String" itemvalue="rqt-gui-py" />
+            <item index="85" class="java.lang.String" itemvalue="rqt-launch" />
+            <item index="86" class="java.lang.String" itemvalue="bson" />
+            <item index="87" class="java.lang.String" itemvalue="PIL" />
+            <item index="88" class="java.lang.String" itemvalue="requests" />
+            <item index="89" class="java.lang.String" itemvalue="utm" />
+            <item index="90" class="java.lang.String" itemvalue="Pillow" />
+            <item index="91" class="java.lang.String" itemvalue="pandas" />
+            <item index="92" class="java.lang.String" itemvalue="numpy" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E126" />
+          <option value="E221" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+  </profile>
+</component>
