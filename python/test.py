@@ -18,9 +18,9 @@ def angleSphere(mu, mu2, phi, phi2):
 
 def HGAPProx(mui, muo, phii, phio, g, k):
     result = 0.0
-    #coeff = HGFourier(np.cos(mui), np.cos(muo), g, k)
+    coeff = HGFourier(np.cos(mui), np.cos(muo), g, k)
     relErr = 0.001
-    coeff = ll.hgFourierSeries(np.cos(muo), np.cos(mui), g, k, relErr)
+    #coeff = ll.hgFourierSeries(np.cos(muo), np.cos(mui), g, k, relErr)
     for l in range(len(coeff)):
         result += coeff[l] * np.cos(l * (phii - phio))
     return result
@@ -34,10 +34,8 @@ phi_i = np.pi
 g = 0.75
 cosGamma = angleSphere(np.cos(mu_o), np.cos(mu_i), abs(np.cos(phi_o) - np.cos(phi_i)), g)
 
-#realValue = HG(np.cos(mu_i), np.cos(mu_o), abs(np.cos(phi_o) - np.cos(phi_i)), g)
-realValue = ll.hg(mu_o=[np.cos(mu_o)], mu_i=[np.cos(mu_i)], g=[g], phi_d=[(phi_i) - (phi_o)])
-print ("llRealValue:")
-print (realValue)
+realValue = HG(np.cos(mu_i), np.cos(mu_o), phi_i - phi_o, g)
+#realValue = ll.hg(mu_o=[np.cos(mu_o)], mu_i=[np.cos(mu_i)], g=[g], phi_d=[(phi_i) - (phi_o)])
 errList = []
 xRange = range(3, 50)
 for k in xRange:
