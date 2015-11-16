@@ -8,3 +8,5 @@ CMakeFiles
 Makefile
 *.cmake
 /scenes
+*.pyc
+python/.idea/*

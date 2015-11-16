@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.special
 
-
 """
     mu_o: the cosine of the output angle (elevation)
     mu_i: the cosine of the input angle (elevation)
@@ -11,11 +10,13 @@ return
     pdf: The pdf value
 """
 
+
 def HG(mu_i, mu_o, phi_d, g):
     sqrtPara = (1.0 - mu_i * mu_i) * (1.0 - mu_o * mu_o)
     cosTheta = mu_i * mu_o + np.cos(phi_d) * np.sqrt(sqrtPara)
     temp = (1.0 + g * g - 2.0 * g * cosTheta)
-    return (1.0 - g *g) / (4.0 * np.pi * temp * np.sqrt(temp))
+    return (1.0 - g * g) / (4.0 * np.pi * temp * np.sqrt(temp))
+
 
 """
     mu: the cosine of the output angle (elevation)
@@ -25,6 +26,8 @@ def HG(mu_i, mu_o, phi_d, g):
 return
     coeff: the computed fourier coefficients (np.matrix)
 """
+
+
 def HGFourier(mo, mi, g, k):
     # compute the A and B coefficients
     a = 1.0 + g * g - 2.0 * g * mi * mo
@@ -33,8 +36,8 @@ def HGFourier(mo, mi, g, k):
     # The latter two integrals can be expressed in full elliptic integrals of the first, E(x), and second, K(x),
     absB = np.abs(b)
     arg = np.sqrt(2.0 * absB / (a + absB))
-    K = scipy.special.ellipk(arg* arg)
-    E = scipy.special.ellipe(arg *arg)
+    K = scipy.special.ellipk(arg * arg)
+    E = scipy.special.ellipe(arg * arg)
     sqrtAB = np.sqrt(a + absB)
     temp = (1.0 - g * g) / (2.0 * np.pi * np.pi)
 
@@ -80,8 +83,3 @@ def HGFourier(mo, mi, g, k):
             coeff[j + 1] = prod * np.sign(g)
 
     return coeff
-
-
-
-
-
