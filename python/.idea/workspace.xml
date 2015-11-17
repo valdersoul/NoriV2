@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e4c34ff3-98e3-4227-9029-46ff1170dce8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/filon.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../CMakeLists.txt.user" afterPath="$PROJECT_DIR$/../CMakeLists.txt.user" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../CMakeLists.txt" afterPath="$PROJECT_DIR$/../CMakeLists.txt" />
     </list>
     <ignored path="python.iws" />
     <ignored path=".idea/workspace.xml" />

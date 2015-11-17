@@ -59,7 +59,7 @@ public:
         if (bRec.measure != ESolidAngle
             || Frame::cosTheta(bRec.wi) <= 0
             || Frame::cosTheta(bRec.wo) <= 0)
-            return 0.0f;
+            return Color3f(0.0f);
 
         // get the Half-direction (mircosurface normal)
         Vector3f hr = (bRec.wi + bRec.wo).normalized();

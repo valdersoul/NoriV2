@@ -301,6 +301,24 @@ float fresnel(float cosThetaI, float extIOR, float intIOR) {
     return (Rs * Rs + Rp * Rp) / 2.0f;
 }
 
+float dielectricReflectance(float eta, float cosThetaI, float &cosThetaT)
+{
+    if (cosThetaI < 0.0f) {
+        eta = 1.0f/eta;
+        cosThetaI = -cosThetaI;
+    }
+    float sinThetaTSq = eta*eta*(1.0f - cosThetaI*cosThetaI);
+    if (sinThetaTSq > 1.0f) {
+        cosThetaT = 0.0f;
+        return 1.0f;
+    }
+    cosThetaT = std::sqrt(std::max(1.0f - sinThetaTSq, 0.0f));
+
+    float Rs = (eta*cosThetaI - cosThetaT)/(eta*cosThetaI + cosThetaT);
+    float Rp = (eta*cosThetaT - cosThetaI)/(eta*cosThetaT + cosThetaI);
+
+    return (Rs*Rs + Rp*Rp)*0.5f;
+}
 
 float conductorReflectance(float cosThetaI, float eta, float k){
     float cosThetaISq = cosThetaI*cosThetaI;
@@ -318,5 +336,6 @@ float conductorReflectance(float cosThetaI, float eta, float k){
 
     return 0.5f*(Rs + Rs*Rp);
 }
+
 
 NORI_NAMESPACE_END

@@ -63,6 +63,7 @@ add_executable(nori
   src/BSDFs/dielectric.cpp
   src/BSDFs/conductor.cpp
   src/BSDFs/roughconductor.cpp
+  src/BSDFs/roughdielectric.cpp
 
   # Cameras
   src/Cameras/perspective.cpp
