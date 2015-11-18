@@ -206,8 +206,12 @@ float Warp::squareToBeckmannPdf(const Vector3f &m, float alpha) {
         //float phi = atan(m(1) / m(0));
 
         //calculate the beckmann pdf
-        float num = exp(- (tan(theta) * tan(theta)) / (alpha * alpha)) * cos(theta);
-        float denum = M_PI * alpha * alpha * cos(theta) * cos(theta) * cos(theta) * cos(theta);
+        float cosTheta2 = cos(theta) * cos(theta);
+        float bEXP = (m.x() * m.x()) / (alpha * alpha)
+                + (m.y()*m.y() / (alpha * alpha)) / (cosTheta2);
+
+        float num = exp(- bEXP);
+        float denum = M_PI * alpha * alpha * cosTheta2 * cosTheta2;
 
         return num / denum ;
     }

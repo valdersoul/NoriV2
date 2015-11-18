@@ -76,10 +76,10 @@ public:
                 if(lightpdf > 0 && Li.maxCoeff() != 0.0f) {
                     //calculate the cosine term wi in my case the vector to the light
                     float cosTerm = std::abs(n.dot(wo));
-                    const BSDFQueryRecord queryEM = BSDFQueryRecord(its.toLocal(- pathRay.d), its.toLocal(wo), EMeasure::ESolidAngle);
+                    const BSDFQueryRecord queryEM = BSDFQueryRecord(its.toLocal(- pathRay.d), its.toLocal(wo), EMeasure::ESolidAngle, sampler);
                     Color3f f = curBSDF->eval(queryEM);
 
-                    if(f.maxCoeff() != 0.0f && vis.Unoccluded(scene)) {
+                    if(f.maxCoeff() > 0.0f && f.minCoeff() >= 0.0f && vis.Unoccluded(scene)) {
                         bsdfpdf = curBSDF->pdf(queryEM);
                         float weight = BalanceHeuristic(float(1), lightpdf, float(1), bsdfpdf);
                         if(curBSDF->isDeltaBSDF())  weight = 1.0f;
@@ -87,19 +87,20 @@ public:
                             Ld = (weight * f * Li * cosTerm) / lightpdf;
                             L += tp * Ld;
                         } else {
-                            cout << "bsdfpdf = " << bsdfpdf  << endl;
+                            //cout << "bsdfpdf = " << bsdfpdf  << endl;
+                            //cout << "f = " << f  << endl;
                         }
                     }
                 }
             }
 
             //Material part
-            BSDFQueryRecord queryMats = BSDFQueryRecord(its.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle);
+            BSDFQueryRecord queryMats = BSDFQueryRecord(its.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle, sampler);
 
             Color3f fi =  curBSDF->sample(queryMats, sampler->next2D());
             bsdfpdf = curBSDF->pdf(queryMats);
             lightpdf = 0.0f;
-            if(fi.maxCoeff() > 0.0f) {
+            if(fi.maxCoeff() > 0.0f && fi.minCoeff() >= 0.0f) {
                 if(bsdfpdf > 0.0f) {
                     Ray3f shadowRay(its.p, its.toWorld(queryMats.wo));
                     Intersection lightIsect;

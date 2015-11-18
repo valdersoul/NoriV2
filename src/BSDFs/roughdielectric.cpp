@@ -39,130 +39,161 @@ public:
 
 
     Color3f eval(const BSDFQueryRecord &bRec) const {
+        if (bRec.measure != ESolidAngle) return Color3f(0.0f);
         /* Discrete BRDFs always evaluate to zero in Nori */
         float wiDotN = bRec.wi.z();
         float woDotN = bRec.wo.z();
+        /* Determine the type of interaction */
+        bool reflect = wiDotN*woDotN > 0.0f;
+        float eta = Frame::cosTheta(bRec.wi) > 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
 
-        bool reflect = wiDotN*woDotN >= 0.0f;
-
-        float eta = wiDotN < 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
         // the mirco scale normal
-        Vector3f m;
-
-        if (reflect)
-            m = sign(wiDotN)*(bRec.wi + bRec.wo).normalized();
-        else
-            m = -(bRec.wi*eta + bRec.wo).normalized();
-
-        float wiDotM = bRec.wi.dot(m);
-        float woDotM = bRec.wo.dot(m);
-        float cosThetaI;
-        float F = dielectricReflectance(eta, wiDotM, cosThetaI);
-        float G = Microfacet::G(m_alpha, bRec.wi, bRec.wo, m);
-        float D = Microfacet::D(m_alpha, m);
+        Vector3f H;
 
         if (reflect) {
-            float fr = (F*G*D*0.25f)/std::abs(wiDotN);
-            return Color3f(fr);
-        } else {
-            float nomSquared = (eta*wiDotM + woDotM) * (eta*wiDotM + woDotM);
-            float fs = std::abs(wiDotM*woDotM)*(1.0f - F)*G*D/(nomSquared*std::abs(wiDotN));
-            return Color3f(fs);
+            /* Calculate the reflection half-vector */
+            H = (bRec.wo+bRec.wi).normalized();
+         } else {
+            H = (bRec.wi + bRec.wo*eta).normalized();
         }
 
+        /* Ensure that the half-vector points into the
+           same hemisphere as the macrosurface normal */
+        H *= sign(Frame::cosTheta(H));
+
+        // Evaluate the microfacet normal distribution
+        const float D = Microfacet::D(m_alpha, H);
+        if (D== 0.0f) {
+            return Color3f(0.0f);
+        }
+
+        float wiDotH = bRec.wi.dot(H);
+
+        // Fresnel factor
+        float cosThetaI;
+        const float F = dielectricReflectance(wiDotH, cosThetaI, eta);
+
+        /* Smith's shadow-masking function */
+        const float G = Microfacet::G(m_alpha, bRec.wi, bRec.wo, H);
+
+
+        if (reflect) {
+            float fr = (F * G * D)/ (4.0f * std::abs(Frame::cosTheta(bRec.wi)));
+            return Color3f(fr);
+        } else {            
+
+
+            /* Calculate the total amount of transmission */
+            float sqrtDenom = bRec.wi.dot(H) + eta * bRec.wo.dot(H);
+            float value = ((1 - F) * D * G * eta * eta
+                * bRec.wi.dot(H) * bRec.wo.dot(H)) /
+                (Frame::cosTheta(bRec.wi) * sqrtDenom * sqrtDenom);
+
+            return std::abs(value);
+        }
     }
-    static float sign(float x) {
-        if (x > 0.0) return 1.0;
-        if (x < 0.0) return -1.0;
-        return 0.0;
+    static inline float sign(float x) {
+        if (x >= 0.0) return 1.0;
+        else return -1.0;
+
+    }
+
+    static Vector3f refract(const Vector3f &wi, const Vector3f &n, float eta, float cosThetaT) {
+        if (cosThetaT < 0)
+            eta = 1 / eta;
+
+        return n * (wi.dot(n) * eta + cosThetaT) - wi * eta;
     }
 
 
 
     float pdf(const BSDFQueryRecord &bRec) const {
+        if (bRec.measure != ESolidAngle)
+            return 0.0f;
         /* Discrete BRDFs always evaluate to zero in Nori */
-        float wiDotN = bRec.wi.z();
-        float woDotN = bRec.wo.z();
 
-        bool reflect = wiDotN*woDotN >= 0.0f;
+        bool reflect    = Frame::cosTheta(bRec.wi)
+                        * Frame::cosTheta(bRec.wo) > 0.0f;
 
-        float eta = wiDotN < 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
+        float eta = Frame::cosTheta(bRec.wi) > 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
         // the mirco scale normal
-        Vector3f m;
+        Vector3f H;
+        float dwh_dwo;
 
         if (reflect) {
-            m = sign(wiDotN)*(bRec.wi + bRec.wo).normalized();
+            H    = (bRec.wi + bRec.wo).normalized();
+
+            /* Jacobian of the half-direction mapping */
+            dwh_dwo = 1.0f / (4.0f * bRec.wo.dot(H));
         } else {
-            m = -(bRec.wi*eta + bRec.wo).normalized();
+            H    = (bRec.wi + bRec.wo * eta).normalized();
+
+            /* Jacobian of the half-direction mapping */
+            float sqrtDenom = bRec.wi.dot(H) + eta * bRec.wo.dot(H);
+            dwh_dwo = (eta*eta * bRec.wo.dot(H)) / (sqrtDenom*sqrtDenom);
         }
 
-        float wiDotM = bRec.wi.dot(m);
-        float woDotM = bRec.wo.dot(m);
+        /* Ensure that the half-vector points into the
+           same hemisphere as the macrosurface normal */
+        H *= sign(Frame::cosTheta(H));
 
-        float cosThetaT;
-        float F = dielectricReflectance(eta, wiDotM, cosThetaT);
-        float pm = Microfacet::pdf(m_alpha, m);
+        float pm = Microfacet::pdf(m_alpha, H);
 
+        float F = dielectricReflectance(bRec.wi.dot(H), m_intIOR / m_extIOR);
+        pm *= reflect ? F : (1-F);
 
-        float pdf;
-        if (reflect) {
-            pdf = F * pm * 0.25f / std::abs(wiDotM);
-         } else {
-            float denomSquared = (eta*wiDotM + woDotM) * (eta*wiDotM + woDotM);
-            pdf = (1.0f - F) * pm * std::abs(woDotM)/denomSquared ;
-        }
-        return pdf;
-
+        return std::abs(pm * dwh_dwo);
     }
 
     Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample) const {        
-        float wiDotN = bRec.wi.z();
-
-        float eta = wiDotN < 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
 
         // sample the mirco scale normal
         Vector3f m = Microfacet::sample(m_alpha, sample);
 
         float pdf = Microfacet::pdf(m_alpha, m);
-        if(pdf == 0.0) return Color3f(0.0f);
+        if(pdf == 0.0) {
+            std::cout << "sample pdf should nearly never be zero";
+            return Color3f(0.0f);
+        }
 
         float wiDotM = bRec.wi.dot(m);
-
         float cosThetaT = 0.0f;
-
-        float F = dielectricReflectance(eta, wiDotM, cosThetaT);
-        float etaM = wiDotM < 0.0f ? m_intIOR / m_extIOR : m_extIOR / m_intIOR;
+        float F = dielectricReflectance(wiDotM, cosThetaT, m_intIOR / m_extIOR);
 
 
-        bool reflect = false;
+        bool sampleReflection = true;
 
         // check if reflection or refraction
         // for reuseable sample
-        if(sample(0) < F) {
-            reflect = true;
+        if(bRec.sampler->next1D() > F) {
+            sampleReflection = false;
         }
 
-        if (reflect) {
-            bRec.wo = 2.0f * wiDotM * m - bRec.wi;
+        if (sampleReflection) {
+            bRec.wo = 2.0f * wiDotM * m - bRec.wi;;
+            bRec.eta = 1.0f;
+
+            /* Side check */
+            if (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo) <= 0)
+                return Color3f(0.0f);
+
         } else {
-            bRec.wo = (etaM * wiDotM - sign(wiDotM) * cosThetaT) * m - etaM * bRec.wi;
+            if (cosThetaT == 0)
+                return Color3f(0.0f);
+            bRec.wo = refract(bRec.wi, m, m_intIOR / m_extIOR, cosThetaT);
+            bRec.eta = cosThetaT < 0 ? m_intIOR / m_extIOR : m_extIOR / m_extIOR;
+
+            /* Side check */
+            if (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo) >= 0)
+                return Color3f(0.0f);
+
+
         }
-
-        float woDotN = bRec.wo.z();
-
-        bool reflected = wiDotN * woDotN > 0.0f;
-        if (reflected != reflect) return Color3f(0.0f);
 
         float G = Microfacet::G(m_alpha, bRec.wi, bRec.wo, m);
         float D = Microfacet::D(m_alpha, m);
 
-
-        Color3f col = Color3f(std::abs(wiDotM) * G * D/(std::abs(wiDotN) * pdf));
-        if (reflect) {
-            return col * F;
-        }
-        else
-            return col * (1.0f - F);
+        return std::abs(D * G * bRec.wi.dot(m) / (pdf * Frame::cosTheta(bRec.wi)));
     }
 
     std::string toString() const {

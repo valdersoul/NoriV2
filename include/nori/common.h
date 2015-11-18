@@ -259,7 +259,12 @@ extern Point2f sphericalCoordinates(const Vector3f &dir);
  */
 extern float fresnel(float cosThetaI, float extIOR, float intIOR);
 
-extern float dielectricReflectance(float eta, float cosThetaI, float &cosThetaT);
+
+
+
+extern float dielectricReflectance(float cosThetaI_, float &cosThetaT_, float eta);
+
+extern float dielectricReflectance(float cosThetaI_, float eta);
 /**
  * \brief Calculates the unpolarized conductor reflection coefficient for a
  * smooth conductor. Handles incidence from either side (i.e.

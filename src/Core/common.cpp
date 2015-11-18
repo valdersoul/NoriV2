@@ -301,23 +301,36 @@ float fresnel(float cosThetaI, float extIOR, float intIOR) {
     return (Rs * Rs + Rp * Rp) / 2.0f;
 }
 
-float dielectricReflectance(float eta, float cosThetaI, float &cosThetaT)
+float dielectricReflectance(float cosThetaI_, float &cosThetaT_, float eta)
 {
-    if (cosThetaI < 0.0f) {
-        eta = 1.0f/eta;
-        cosThetaI = -cosThetaI;
-    }
-    float sinThetaTSq = eta*eta*(1.0f - cosThetaI*cosThetaI);
-    if (sinThetaTSq > 1.0f) {
-        cosThetaT = 0.0f;
+    /* Using Snell's law, calculate the squared sine of the
+       angle between the normal and the transmitted ray */
+    float scale = (cosThetaI_ > 0) ? 1/eta : eta,
+          cosThetaTSqr = 1 - (1-cosThetaI_*cosThetaI_) * (scale*scale);
+
+    /* Check for total internal reflection */
+    if (cosThetaTSqr <= 0.0f) {
+        cosThetaT_ = 0.0f;
         return 1.0f;
     }
-    cosThetaT = std::sqrt(std::max(1.0f - sinThetaTSq, 0.0f));
 
-    float Rs = (eta*cosThetaI - cosThetaT)/(eta*cosThetaI + cosThetaT);
-    float Rp = (eta*cosThetaT - cosThetaI)/(eta*cosThetaT + cosThetaI);
+    /* Find the absolute cosines of the incident/transmitted rays */
+    float cosThetaI = std::abs(cosThetaI_);
+    float cosThetaT = std::sqrt(cosThetaTSqr);
 
-    return (Rs*Rs + Rp*Rp)*0.5f;
+    float Rs = (cosThetaI - eta * cosThetaT)
+             / (cosThetaI + eta * cosThetaT);
+    float Rp = (eta * cosThetaI - cosThetaT)
+             / (eta * cosThetaI + cosThetaT);
+
+    cosThetaT_ = (cosThetaI_ > 0) ? -cosThetaT : cosThetaT;
+
+    /* No polarization -- return the unpolarized reflectance */
+    return 0.5f * (Rs * Rs + Rp * Rp);;
+}
+float dielectricReflectance(float cosThetaI_, float eta){
+    float dummy;
+    return dielectricReflectance(cosThetaI_, dummy, eta);
 }
 
 float conductorReflectance(float cosThetaI, float eta, float k){

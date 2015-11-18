@@ -41,8 +41,13 @@ struct BSDFQueryRecord {
     //float pdf;
     bool entering = false;
 
+
+
     /// Measure associated with the sample
     EMeasure measure;
+
+    /// add a sampler to the BSDF query
+    Sampler *sampler;
 
     /// Create a new record for sampling the BSDF
     BSDFQueryRecord(const Vector3f &wi)
@@ -52,6 +57,11 @@ struct BSDFQueryRecord {
     BSDFQueryRecord(const Vector3f &wi,
             const Vector3f &wo, EMeasure measure)
         : wi(wi), wo(wo), measure(measure) { }
+
+    /// Create a new record for querying the BSDF
+    BSDFQueryRecord(const Vector3f &wi,
+            const Vector3f &wo, EMeasure measure, Sampler *sampler)
+        : wi(wi), wo(wo), measure(measure), sampler(sampler) { }
 };
 
 /**

@@ -46,7 +46,7 @@ public:
             const BSDF* curBSDF = its.mesh->getBSDF();
 
             //transform to the local frame
-            BSDFQueryRecord query = BSDFQueryRecord(its.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle);
+            BSDFQueryRecord query = BSDFQueryRecord(its.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle, sampler);
 
             //sample the BRDF
             Color3f fi =  curBSDF->sample(query, sampler->next2D());
