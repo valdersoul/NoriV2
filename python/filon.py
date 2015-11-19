@@ -48,7 +48,8 @@ def filon(phi, f, lmax, output):
     return output
 
 
-def filonIntegrate(f, coeffs, nCoeffs, nEvals, a, b):
+def filonIntegrate(f, nCoeffs, nEvals, a, b):
+    coeffs = np.zeros(nCoeffs)
     if nEvals % 2 == 0:
         nEvals += 1
 
