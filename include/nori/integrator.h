@@ -59,6 +59,13 @@ public:
      * provided by this instance
      * */
     EClassType getClassType() const { return EIntegrator; }
+
+    /**
+     * @brief advance
+     * @return true if the render is a progressive integrator
+     */
+
+    virtual bool advance() { return false; }
 };
 
 NORI_NAMESPACE_END

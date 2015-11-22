@@ -51,6 +51,14 @@ public:
             block.getOffset().y()
         );
     }
+    void prepare(const ImageBlock &block, const int p) {
+        // +1 added to prevent having block with offset [0,0]
+        // to have the same seed every pass
+        m_random.seed(
+            (block.getOffset().x() + 1) * p,
+            (block.getOffset().y() + 1) * p
+            );
+    }
 
     void generate() { /* No-op for this sampler */ }
     void advance()  { /* No-op for this sampler */ }

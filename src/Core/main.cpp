@@ -69,11 +69,8 @@ static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block)
 static void render(Scene *scene, const std::string &filename, const int nrThreads, const bool showWindow, const bool saveEveryStep) {
     const Camera *camera = scene->getCamera();
     Vector2i outputSize = camera->getOutputSize();
-    scene->getIntegrator()->preprocess(scene);
-    NoriScreen *screen = nullptr;
 
-    /* Create a block generator (i.e. a work scheduler) */
-    BlockGenerator blockGenerator(outputSize, NORI_BLOCK_SIZE);
+    NoriScreen *screen = nullptr;
 
     /* Allocate memory for the entire output image and clear it */
     ImageBlock result(outputSize, camera->getReconstructionFilter());
@@ -104,48 +101,67 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
         cout.flush();
         Timer timer;
 
+        do {
+            scene->getIntegrator()->preprocess(scene);
+
+            int nPasses = scene->getNumberOfPasses();
+
+            //BEGIN MULTIPLE PASS LOOP - PROGRESSIVE RENDERING WITH THE SAME INTEGRATOR SETTINGS
+            for (int p = 1; p <= nPasses; p++){
+                std::cout << "Rendering pass " << p << "/" << nPasses << std::endl;
+                /* Create a block generator (i.e. a work scheduler) */
+                BlockGenerator blockGenerator(outputSize, NORI_BLOCK_SIZE);
+
+                tbb::task_scheduler_init init(nrThreads);
+                tbb::blocked_range<int> range(0, blockGenerator.getBlockCount());
+
+                auto map = [&](const tbb::blocked_range<int> &range) {
+                    /* Allocate memory for a small image block to be rendered
+                       by the current thread */
+                    ImageBlock block(Vector2i(NORI_BLOCK_SIZE),
+                        camera->getReconstructionFilter());
 
 
-        tbb::task_scheduler_init init(nrThreads);
-        tbb::blocked_range<int> range(0, blockGenerator.getBlockCount());
+                    /* Create a clone of the sampler for the current thread */
+                    std::unique_ptr<Sampler> sampler(scene->getSampler()->clone());
 
-        auto map = [&](const tbb::blocked_range<int> &range) {
-            /* Allocate memory for a small image block to be rendered
-               by the current thread */
-            ImageBlock block(Vector2i(NORI_BLOCK_SIZE),
-                camera->getReconstructionFilter());
+                    for (int i=range.begin(); i<range.end(); ++i) {
+                        /* Request an image block from the block generator */
+                        blockGenerator.next(block);
 
+                        /* Inform the sampler about the block to be rendered */
+                        sampler->prepare(block, p);
 
-            /* Create a clone of the sampler for the current thread */
-            std::unique_ptr<Sampler> sampler(scene->getSampler()->clone());
+                        /* Render all contained pixels */
+                        renderBlock(scene, sampler.get(), block);
 
-            for (int i=range.begin(); i<range.end(); ++i) {
-                /* Request an image block from the block generator */
-                blockGenerator.next(block);
+                        /* The image block has been processed. Now add it to
+                           the "big" block that represents the entire image */
+                        result.put(block);
+                        if(saveEveryStep) {
+                            std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
-                /* Inform the sampler about the block to be rendered */
-                sampler->prepare(block);
+                            /* Save using the png format */
+                            bitmap->savePNG(outputNamePNG);
+                        }
+                    }
+                };
 
-                /* Render all contained pixels */
-                renderBlock(scene, sampler.get(), block);
+                /// Uncomment the following line for single threaded rendering
+                // map(range);
 
-                /* The image block has been processed. Now add it to
-                   the "big" block that represents the entire image */
-                result.put(block);
-                if(saveEveryStep) {
-                    std::unique_ptr<Bitmap> bitmap(result.toBitmap());
+                /// Default: parallel rendering
+                tbb::parallel_for(range, map);
+                /* Now turn the rendered image block into
+                   a properly normalized bitmap */
+                std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
-                    /* Save using the OpenEXR format */
-                    bitmap->savePNG(outputNamePNG);
-                }
+                /* Save using the OpenEXR format */
+                bitmap->save(outputName);
             }
-        };
-
-        /// Uncomment the following line for single threaded rendering
-        // map(range);
-
-        /// Default: parallel rendering
-        tbb::parallel_for(range, map);
+        // DOES THE RENDERER WANT TO CONTINUE WITH DIFFERENT SETTINGS?
+        // EXAMPLE - RADIUS CHANGE FOR PHOTON MAPPING
+        } while (scene->getIntegrator()->advance());
 
         cout << "done. (took " << timer.elapsedString() << ")" << endl;
     });
@@ -161,13 +177,6 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
         delete screen;
         nanogui::shutdown();
     }
-
-    /* Now turn the rendered image block into
-       a properly normalized bitmap */
-    std::unique_ptr<Bitmap> bitmap(result.toBitmap());
-
-    /* Save using the OpenEXR format */
-    bitmap->save(outputName);
 }
 
 int main(int argc, char **argv) {

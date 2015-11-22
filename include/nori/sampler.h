@@ -79,6 +79,16 @@ public:
     virtual void prepare(const ImageBlock &block) = 0;
 
     /**
+     * \brief Prepare to render a new image block with progressive rendering
+     *
+     * This function is called when the sampler begins rendering
+     * a new image block. This can be used to deterministically
+     * initialize the sampler so that repeated program runs
+     * always create the same image.
+     */
+    virtual void prepare(const ImageBlock &block, const int p) = 0;
+
+    /**
      * \brief Prepare to generate new samples
      * 
      * This function is called initially and every time the 

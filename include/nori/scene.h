@@ -130,6 +130,10 @@ public:
     std::string toString() const;
 
     EClassType getClassType() const { return EScene; }
+
+    int getNumberOfPasses() const { return m_numberOfPasses; }
+
+    void setNumberOfPasses(int n) { m_numberOfPasses = n; }
 private:
     std::vector<Mesh *> m_meshes;
     std::vector<Emitter *> m_emitters;
@@ -138,6 +142,7 @@ private:
     Sampler *m_sampler = nullptr;
     Camera *m_camera = nullptr;
     BVH *m_bvh = nullptr;
+    int m_numberOfPasses = 1;
     Emitter *m_distantEmitter = nullptr;
 };
 

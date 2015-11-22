@@ -27,8 +27,9 @@
 
 NORI_NAMESPACE_BEGIN
 
-Scene::Scene(const PropertyList &) {
+Scene::Scene(const PropertyList &props) {
     m_bvh = new BVH();
+    m_numberOfPasses = props.getInteger("nrPasses", 1);
 }
 
 Scene::~Scene() {
