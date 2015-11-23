@@ -92,7 +92,7 @@ public:
      *                 no interaction inside the medium could be sampled.
      */
     virtual bool sampleDistance(const Ray3f &ray,
-        MediumSamplingRecord &mRec, Sampler *sampler) const = 0;
+        MediumSamplingRecord &mRec, const Point2f &sample) const = 0;
 
     /**
      * \brief Compute the 1D density of sampling distance \a ray.maxt
@@ -114,8 +114,7 @@ public:
      * [mint, maxt] associated with the ray. It is assumed
      * that the ray has a normalized direction value.
      */
-    virtual Color3f evalTransmittance(const Ray3f &ray,
-        Sampler *sampler = NULL) const = 0;
+    virtual Color3f evalTransmittance(const Ray3f &ray, const Point2f &sample) const = 0;
 
     /// Return the phase function of this medium
     inline const PhaseFunction *getPhaseFunction() const { return m_phaseFunction; }
