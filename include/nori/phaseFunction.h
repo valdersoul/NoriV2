@@ -44,6 +44,7 @@ struct PhaseFunctionQueryRecord {
     /// Measure associated with the sample
     EMeasure measure;
 
+    PhaseFunctionQueryRecord() { }
     /// Create a new record for sampling the BSDF
     PhaseFunctionQueryRecord(const Vector3f &wi)
         : wi(wi), measure(EUnknownMeasure) { }

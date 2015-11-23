@@ -117,6 +117,8 @@ add_executable(nori
   src/Integrators/volumetricPhotonmapper.cpp
   src/Integrators/beamRadianceEstimate.cpp
   src/Integrators/beamRESurfKNN.cpp
+  src/Integrators/basicMediumPathTracer.cpp
+
 
 
 

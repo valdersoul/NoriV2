@@ -38,7 +38,7 @@ public:
         int channel = std::min((int) (sample(1) * 3.0f), 2);
         samplingDensity = m_sigmaT[channel];
 
-        sampledDistance = -std::log(1-rand) / samplingDensity;
+        sampledDistance = -std::log(1.0f - rand) / samplingDensity;
 
         float distSurf = ray.maxt - ray.mint;
         bool success = true;
@@ -60,15 +60,15 @@ public:
         }
 
 
-        mRec.pdfFailure = 0;
-        mRec.pdfSuccess = 0;
+        mRec.pdfFailure = 0.0f;
+        mRec.pdfSuccess = 0.0f;
         for (int i=0; i<3; ++i) {
             float tmp = std::exp(-m_sigmaT[i] * sampledDistance);
             mRec.pdfFailure += tmp;
             mRec.pdfSuccess += m_sigmaT[i] * tmp;
         }
-        mRec.pdfFailure /= 3;
-        mRec.pdfSuccess /= 3;
+        mRec.pdfFailure /= 3.0f;
+        mRec.pdfSuccess /= 3.0f;
 
         Color3f temp = (m_sigmaT * (-sampledDistance));
         mRec.transmittance = temp.expElemwise();
@@ -169,5 +169,5 @@ public:
 
 };
 
-NORI_REGISTER_CLASS(HomogeneousMedium, "homogeneousMedium");
+NORI_REGISTER_CLASS(HomogeneousMedium, "homogeneous");
 NORI_NAMESPACE_END

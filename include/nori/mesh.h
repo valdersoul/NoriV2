@@ -165,7 +165,7 @@ public:
     bool hasBumpMap() const { return m_bumpmap != nullptr; }
 
     /// Is this mesh a bumpmap?
-    //bool hasMedium() const { return m_medium != nullptr; }
+    bool hasMedium() const { return m_medium != nullptr; }
 
     /// Return a pointer to an attached area emitter instance
     Emitter *getEmitter() { return m_emitter; }
@@ -180,7 +180,7 @@ public:
     const BumpTexture *getBumpmap() const { return m_bumpmap; }
 
     /// Return a pointer to an attached bump map instance (const version)
-    //const Medium *getMedium() const { return m_medium; }
+    const Medium *getMedium() const { return m_medium; }
 
     /// Return a pointer to the BSDF associated with this mesh
     const BSDF *getBSDF() const { return m_bsdf; }
