@@ -27,6 +27,7 @@ add_executable(nori
   include/nori/block.h
   include/nori/bumpTexture.h
   include/nori/bsdf.h
+  include/nori/medium.h
   include/nori/bvh.h
   include/nori/camera.h
   include/nori/color.h
@@ -64,6 +65,9 @@ add_executable(nori
   src/BSDFs/conductor.cpp
   src/BSDFs/roughconductor.cpp
   src/BSDFs/roughdielectric.cpp
+
+  #medium
+  src/Medium/homogeneous.cpp
 
   # Cameras
   src/Cameras/perspective.cpp
@@ -113,6 +117,8 @@ add_executable(nori
   src/Integrators/volumetricPhotonmapper.cpp
   src/Integrators/beamRadianceEstimate.cpp
   src/Integrators/beamRESurfKNN.cpp
+
+
 
   # Sampler
   src/Sampler/independent.cpp

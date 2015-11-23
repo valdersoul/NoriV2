@@ -108,7 +108,7 @@ void Scene::addChild(NoriObject *obj) {
                 throw NoriException("There can only be one integrator per scene!");
             m_integrator = static_cast<Integrator *>(obj);
             break;
-        case EMedium:
+        case EVolume:
             {
                 Volume *vol = static_cast<Volume *>(obj);
                 m_volumes.push_back(vol);

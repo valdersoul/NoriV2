@@ -73,7 +73,7 @@ public:
 
     virtual void addChild(NoriObject *obj) {}
 
-    EClassType getClassType() const { return EMedium; }
+    EClassType getClassType() const { return EVolume; }
 protected:
      //Variabeles
     const Transform VolumeToWorld;

@@ -120,6 +120,7 @@ typedef TRay<Point3f, Vector3f> Ray3f;
 
 /// Some more forward declarations
 class BSDF;
+class Medium;
 class Bitmap;
 class BlockGenerator;
 class Camera;

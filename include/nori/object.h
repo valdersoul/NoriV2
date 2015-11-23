@@ -43,6 +43,7 @@ public:
         EPhaseFunction,
         EEmitter,
         EMedium,
+        EVolume,
         ECamera,
         EIntegrator,
         ESampler,
@@ -106,6 +107,8 @@ public:
             case EMIXTEXTURE: return "mixTexture";
             case EMIXBUMPMAP: return "mixBumpmap";
             case ECamera:     return "camera";
+            case EMedium:     return "medium";
+            case EVolume:     return "volume";
             case EIntegrator: return "integrator";
             case ESampler:    return "sampler";
             case ETest:       return "test";

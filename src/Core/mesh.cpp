@@ -19,6 +19,7 @@
 #include <nori/mesh.h>
 #include <nori/bbox.h>
 #include <nori/bsdf.h>
+#include <nori/medium.h>
 #include <nori/texture.h>
 #include <nori/emitter.h>
 #include <nori/warp.h>
@@ -232,6 +233,16 @@ void Mesh::addChild(NoriObject *obj) {
                 m_emitter = emitter;
             }
             break;
+        case EMedium: {
+
+            Medium *media = static_cast<Medium *>(obj);
+            if (m_medium)
+                throw NoriException(
+                    "Mesh: tried to register multiple medium instances!");
+            m_medium = media;
+
+        }
+        break;
 
         default:
             throw NoriException("Mesh::addChild(<%s>) is not supported!",

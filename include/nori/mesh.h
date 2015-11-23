@@ -26,6 +26,7 @@
 #include <nori/texture.h>
 #include <nori/bumpTexture.h>
 
+
 NORI_NAMESPACE_BEGIN
 
 /**
@@ -163,6 +164,9 @@ public:
     /// Is this mesh a bumpmap?
     bool hasBumpMap() const { return m_bumpmap != nullptr; }
 
+    /// Is this mesh a bumpmap?
+    //bool hasMedium() const { return m_medium != nullptr; }
+
     /// Return a pointer to an attached area emitter instance
     Emitter *getEmitter() { return m_emitter; }
 
@@ -174,6 +178,9 @@ public:
 
     /// Return a pointer to an attached bump map instance (const version)
     const BumpTexture *getBumpmap() const { return m_bumpmap; }
+
+    /// Return a pointer to an attached bump map instance (const version)
+    //const Medium *getMedium() const { return m_medium; }
 
     /// Return a pointer to the BSDF associated with this mesh
     const BSDF *getBSDF() const { return m_bsdf; }
@@ -212,9 +219,7 @@ protected:
     DiscretePDF *m_dpdf = nullptr;       ///< PDF of the emitter
     Texture *m_texture = nullptr;        ///< texture of the mesh
     BumpTexture *m_bumpmap = nullptr;    ///< bumpmap of the mesh
-
-
-
+    Medium *m_medium = nullptr;          ///< medium inside the mesh
 };
 
 NORI_NAMESPACE_END
