@@ -31,49 +31,52 @@ public:
         bool validIntersection = scene->rayIntersect(ray, its);
 
         while(true) {
-            if(validIntersection && its.mesh->hasMedium()){
+            // there is an intersection and the mesh contains a medium
+            if(validIntersection && its.mesh->hasMedium() &&
+               its.mesh->getMedium()->sampleDistance(Ray3f(pathRay, 0.0, its.t), mRec, sampler->next2D())){
+
                 const Medium *curMedium = its.mesh->getMedium();
-                Frame w2v(pathRay.d);
                 PhaseFunctionQueryRecord pRec;
-                bool scatterEvent = curMedium->sampleDistance(Ray3f(pathRay, 0.0, its.t), mRec, sampler->next2D());
-                if(scatterEvent) {
-                    const PhaseFunction *phase = curMedium->getPhaseFunction();
-                    tp *= mRec.sigmaS * mRec.transmittance / mRec.pdfSuccess;
+
+                const PhaseFunction *phase = curMedium->getPhaseFunction();
+                tp *= mRec.sigmaS * mRec.transmittance / mRec.pdfSuccess;
 
 
-                    pRec = PhaseFunctionQueryRecord(w2v.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle);
-                    float phaseVal = phase->sample(pRec, sampler->next2D());
+                pRec = PhaseFunctionQueryRecord(-pathRay.d, Vector3f(0.0f), EMeasure::ESolidAngle);
+                float phaseVal = phase->sample(pRec, sampler->next2D());
 
-                    if (phaseVal == 0){
-                        std::cout << "phaseVal is zero!" << std::endl;
-                        break;
-                    }
-                    tp *= phaseVal;
-
-                    //std::cerr << "scattering tp = " << tp << std::endl;
-                } else {
-                    // no scattering direct fly trough the medium
-                    //std::cerr << "Fly trough" << std::endl;
-                    tp *= mRec.transmittance / mRec.pdfFailure;
+                if (phaseVal == 0){
+                    std::cout << "phaseVal is zero!" << std::endl;
+                    break;
                 }
-                if(scatterEvent) {
-                    Vector3f wo = w2v.toWorld(pRec.wo);
-                    pathRay = Ray3f(mRec.p, wo);
-                } else {
-                    pathRay = Ray3f(mRec.p, pathRay.d);
-                }
+                tp *= phaseVal;
+
+                //std::cerr << "scattering tp = " << tp << std::endl;
+                Vector3f wo = Frame(-pRec.wi).toWorld(pRec.wo);
+                pathRay = Ray3f(mRec.p, wo);
+                pathRay.mint = 0.0f;
                 validIntersection = scene->rayIntersect(pathRay, its);
 
-            } else if(!validIntersection) {
-                const Emitter* distantsDisk = scene->getDistantEmitter();
-                //sample the distant disk light
-                if(distantsDisk != nullptr ) {
-                    tp *= distantsDisk->sampleL(pathRay.d);
-                }
-                break;
+
+
             } else {
+                if(!validIntersection) {
+                    const Emitter* distantsDisk = scene->getDistantEmitter();
+                    //sample the distant disk light
+                    if(distantsDisk != nullptr ) {
+                        tp *= distantsDisk->sampleL(pathRay.d);
+                    }
+                    break;
+                }
+
+                if(its.mesh->hasMedium())
+                    tp *= mRec.transmittance / mRec.pdfFailure;
+
+
+
                 // surface interaction
-                //get the radiance of hitten object
+                // get the radiance of hitten object
+                // check if the mesh is an emitter
                 if (its.mesh->isEmitter() ) {
                     const Emitter* areaLightEM = its.mesh->getEmitter();
                     const areaLight* aEM = static_cast<const areaLight *> (areaLightEM);
@@ -84,7 +87,10 @@ public:
                 const BSDF* curBSDF = its.mesh->getBSDF();
 
                 //transform to the local frame
-                BSDFQueryRecord bRec = BSDFQueryRecord(its.toLocal(-pathRay.d), Vector3f(0.0f), EMeasure::ESolidAngle);
+                BSDFQueryRecord bRec = BSDFQueryRecord(its.toLocal(-pathRay.d),
+                                                       Vector3f(0.0f),
+                                                       EMeasure::ESolidAngle,
+                                                       sampler);
 
                 //sample the BSDF
                 Color3f bsdfVal =  curBSDF->sample(bRec, sampler->next2D());
