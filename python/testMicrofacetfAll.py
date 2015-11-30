@@ -2,17 +2,17 @@ import numpy as np
 import math
 import scipy.special as sp
 import matplotlib.pyplot as plt
-from microfacet import microfacetNoExp, getAB, Bmax
+from microfacet import microfacetNoExp, getAB, Bmax, microfacetFourierSeries, microfacetNoExpFourierSeries
 from filon import filonIntegrate
 from BSDFFourier import expcos_fseries, fseries_convolve, expcosCoefficientCount
 from fourierBasic import fourierEval
 import layerlab as ll
 
 
-n = 100
+n = 1000
 a = 0.0
 b = np.pi
-nCoeffb = 12
+nCoeffb = 4
 nEvals = 200
 phi = np.linspace(a, b, n)
 y  = np.zeros(n)
@@ -24,36 +24,32 @@ eta_i = 1.5
 eta_o = 1.0
 eta = eta_i / eta_o
 etaC = complex(eta, 0)
-relerr = 10e-4
+relerr = 10e-6
 
 for i in range(n):
     curPhi = phi[i]
     y[i] = microfacetNoExp(mu_o, mu_i, etaC, alpha, curPhi)
 
+quickTest = ll.microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
+quickTest2 = microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
+cOrig = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
+c = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n)
+cnoExp = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, nCoeffb, np.pi)
 
-def f(a):
-    return microfacetNoExp(mu_o, mu_i, etaC, alpha, a)
-# compute the fourier approx
-b = filonIntegrate(f, nCoeffb, nEvals, a, b)
+print("Our coeff: " + str(len(c)))
+print("ll coeff: " + str(len(cOrig)))
 
-A, B = getAB(mu_i, mu_o, etaC, alpha)
+plt.figure()
+plt.plot(cOrig, 'b')
+plt.plot(c, 'r--')
+plt.savefig("Coeff.pdf")
 
-B_max = Bmax(n, relerr)
-if B > B_max:
-    A = A + B - B_max + math.log(sp.i0e(B) / sp.i0e(B_max))
-    B = B_max
-
-nCoeffa = expcosCoefficientCount(B, relerr)
-print (nCoeffa)
-a = expcos_fseries(A, B, nCoeffa)
-c = fseries_convolve(a, nCoeffa, b, nCoeffb)
-# c = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, nCoeff, 10e-4)
-
+yOrig = fourierEval(cOrig, phi)
 y = fourierEval(c, phi)
 
 plt.figure()
-plt.plot(phi, y, 'b')
-plt.title("Used "+  str(nCoeffa) + " for the high frequency")
-#plt.show()
+plt.plot(phi, yOrig, 'b')
+plt.plot(phi, y, 'r--')
+plt.title("for the high frequency")
 plt.savefig("MicrofacetgraphAll.pdf")
 

@@ -2,6 +2,10 @@ import frame as f
 import math
 import numpy as np
 import layerlab as ll
+from BSDFFourier import expcos_fseries, fseries_convolve, expcosCoefficientCount
+from filon import filonIntegrate
+import scipy.special as sp
+import sys
 
 
 def fresnelDielectric(cosThetaI_, cosThetaT_, eta):
@@ -66,7 +70,8 @@ def smithG1(v, m, alpha):
     # /* Can't see the back side from the front and vice versa */
     if np.dot(v, m) * f.cosTheta(v) <= 0:
         return 0.0
-
+    # if alpha * tanTheta == 0.0:
+    #    return 0.0
     a = 1.0 / (alpha * tanTheta)
     if a < 1.6:
         aSqr = a * a
@@ -159,3 +164,83 @@ def Bmax(n, relerr):
         return 0.0299 * math.pow(n, 2.02628)
     else:
         print("Bmax(): unknown relative error bound!")
+
+
+def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
+    # const
+    nEvals = 200
+    eps = 10e-4
+
+    def foo(a):
+        return microfacetNoExp(mu_o, mu_i, etaC, alpha, a)
+
+    reflect = - mu_o * mu_i > 0.0
+    sinMu2 = f.safe_sqrt((1.0 - mu_i * mu_i) * (1.0 - mu_o * mu_o))
+    phiCritical = 0.0
+    conductor = etaC.imag != 0.0
+
+    if -mu_i > 0.0 or conductor:
+        eta = etaC
+    else:
+        eta = complex(1.0, 0.0) / etaC
+
+    if reflect:
+        if not conductor:
+            if sinMu2 == 0:
+                temp = -1.0
+            else:
+                temp = (2.0 * eta.real * eta.real - mu_i * mu_o - 1.0) / sinMu2
+            phiCritical = f.safe_acos(temp)
+    elif not reflect:
+        if eta.real > 1.0:
+            etaDenser = eta.real
+        else:
+            etaDenser = 1.0 / eta.real
+        if sinMu2 == 0:
+            temp = -1.0
+        else:
+            temp = (1.0 - etaDenser * mu_i * mu_o) / (etaDenser * sinMu2)
+        phiCritical = f.safe_acos(temp)
+
+    if reflect:
+        if phiCritical > eps and phiCritical < phiMax - eps:
+
+            b1 = filonIntegrate(foo, n, nEvals, 0.0, phiCritical)
+            b2 = filonIntegrate(foo, n, nEvals, phiCritical, phiMax)
+            b = np.concatenate((b1, b2), axis=0)
+        else:
+            b = filonIntegrate(foo, n, nEvals, 0.0, phiMax)
+    else:
+        b = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax))
+
+    # ToDo: if (phiMax < math::Pi - math::Epsilon) SVD stuff
+    return b
+
+
+def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
+    A, B = getAB(mu_i, mu_o, etaC, alpha)
+
+    if sp.i0e(B) * np.exp(A+B) < 1e-10:
+        return [0.0]
+
+    B_max = Bmax(n, relerr)
+    if B > B_max:
+        A = A + B - B_max + math.log(sp.i0e(B) / sp.i0e(B_max))
+        B = B_max
+
+    expcos_coeffs = expcos_fseries(A, B, relerr)
+    if B == 0.0:
+        phiMax = f.safe_acos(-1.0)
+    else:
+        phiMax = f.safe_acos(1.0 + np.log(relerr) / B)
+
+    lowfreq_coeffs = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, 12, phiMax)
+
+    result = fseries_convolve(lowfreq_coeffs, len(lowfreq_coeffs), expcos_coeffs, len(expcos_coeffs))
+
+    for i in range(len(result)):
+        if result[i] == 0 or np.abs(result[i]) < result[0] * relerr:
+            result = result[:i]
+            break
+
+    return result

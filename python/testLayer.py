@@ -8,7 +8,7 @@ import numpy as np
 n = 128
 mu, w = gausLobatto(n)
 
-m = 20
+m = 12
 eta = complex(1.1, 0.0)
 alpha = 0.6
 run = 2
@@ -33,9 +33,11 @@ if run == 1:
 elif run == 2:
 
     coating = layer(mu, w, m)
+    print("setting microfacet")
     coating.setMicrofacet(eta, alpha)
 
     for i in range(m):
+        print(i)
         plt.figure()
         plt.imshow(coating.scatteringMatrix[:, :, i], cmap=plt.get_cmap('gray'))
         plt.savefig('images/microfacet' + str(i) + '.png')

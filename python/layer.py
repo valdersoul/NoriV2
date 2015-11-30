@@ -1,5 +1,6 @@
 import numpy as np
 import layerlab as ll
+from microfacet import microfacetFourierSeries
 
 
 class layer:
@@ -42,8 +43,8 @@ class layer:
         FL = np.zeros((n, n, fourierOrdersTarget))
         for i in range(n):
             for o in range(n):
-                coeffs = ll.microfacetFourierSeries(- self.nodes[o], - self.nodes[i], eta, alpha, fourierOrdersTarget,
-                                                    10e-4)
+                coeffs = ll.microfacetFourierSeries(- self.nodes[o], - self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-4)
+                #coeffs = microfacetFourierSeries(- self.nodes[o], - self.nodes[i], eta, alpha, fourierOrdersTarget)
                 for l in range(len(coeffs[:fourierOrdersTarget])):
                     FL[o, i, l] = coeffs[l]
 

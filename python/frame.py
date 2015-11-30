@@ -17,5 +17,10 @@ def cosTheta(v):
 def tanTheta(v):
     return sinTheta(v) / cosTheta(v)
 
+
 def safe_sqrt(value):
     return math.sqrt(max(0.0, value))
+
+
+def safe_acos(value):
+    return np.arccos(min(1.0, max(-1.0, value)))
