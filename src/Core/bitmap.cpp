@@ -118,9 +118,17 @@ void Bitmap::savePNG(const std::string &filename) {
     for ( ssize_t row = 0; row < rows() ; ++row )
        for ( ssize_t column = 0; column < cols() ; ++column ) {
             Color4f  curColor = coeffRef(row, column);
-            Magick::ColorRGB curColorMagick(std::pow(curColor(0), 1.0f / m_gamma),
-                                            std::pow(curColor(1), 1.0f / m_gamma),
-                                            std::pow(curColor(2), 1.0f / m_gamma));
+            double r = std::pow(curColor(0), 1.0f / m_gamma);
+            r = r > 1.0d ? 1.0d: r;
+            r = r < 0.0d ? 0.0d: r;
+            double g = std::pow(curColor(1), 1.0f / m_gamma);
+            g = g > 1.0d ? 1.0d: g;
+            g = g < 0.0d ? 0.0d: g;
+            double b = std::pow(curColor(2), 1.0f / m_gamma);
+            b = b > 1.0d ? 1.0d: b;
+            b = b < 0.0d ? 0.0d: b;
+
+            Magick::ColorRGB curColorMagick(r, g, b);
             *pixels++=curColorMagick;
        }
 
