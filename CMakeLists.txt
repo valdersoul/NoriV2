@@ -166,6 +166,7 @@ add_dependencies(nori OpenEXR_p)
 add_dependencies(nori nanogui_p)
 add_dependencies(nori tbb_p)
 add_dependencies(nori pugixml)
+add_dependencies(nori pngPlusPlus_p)
 add_dependencies(warptest nori)
 
 # Link to dependency libraries
@@ -173,12 +174,61 @@ target_link_libraries(nori ${extra_libs})
 target_link_libraries(warptest ${extra_libs})
 
 # find image magick++
-find_package(ImageMagick COMPONENTS Magick++)
-if (ImageMagick_FOUND)
-    include_directories(${ImageMagick_INCLUDE_DIRS})
-    target_link_libraries (nori ${ImageMagick_LIBRARIES})
-    target_link_libraries (warptest ${ImageMagick_LIBRARIES})
-    MESSAGE( STATUS "ImageMagick found!")
-endif (ImageMagick_FOUND)
+#find_package(ImageMagick COMPONENTS Magick++)
+#if (ImageMagick_FOUND)
+#    include_directories(${ImageMagick_INCLUDE_DIRS})
+#    target_link_libraries (nori ${ImageMagick_LIBRARIES})
+#    target_link_libraries (warptest ${ImageMagick_LIBRARIES})
+#    MESSAGE( STATUS "ImageMagick found!")
+#endif (ImageMagick_FOUND)
+
+# find png 
+find_package(PNG REQUIRED)
+if(PNG_FOUND)    
+    find_path(png++_INCLUDE_DIR
+      NAMES   
+        color.hpp  
+        config.hpp  
+        consumer.hpp  
+        convert_color_space.hpp
+        end_info.hpp  
+        error.hpp  
+        ga_pixel.hpp  
+        generator.hpp
+        gray_pixel.hpp  
+        image.hpp  
+        image_info.hpp  
+        index_pixel.hpp
+        info.hpp  
+        info_base.hpp  
+        io_base.hpp  
+        packed_pixel.hpp
+        palette.hpp  
+        pixel_buffer.hpp  
+        pixel_traits.hpp  
+        png.hpp
+        reader.hpp  
+        require_color_space.hpp  
+        rgb_pixel.hpp  
+        rgba_pixel.hpp
+        streaming_base.hpp  
+        tRNS.hpp  
+        types.hpp  
+        writer.hpp
+      PATHS
+        ${CMAKE_SOURCE_DIR}/ext/png++
+      NO_DEFAULT_PATH)
+
+  set(png++_INCLUDE_DIRS ${png++_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
+  # ext/png++ is a header-only program, so no libraries of its own.
+  set(png++_LIBRARIES ${PNG_LIBRARIES})
+  MESSAGE( STATUS ${png++_INCLUDE_DIRS})
+  include_directories(${png++_INCLUDE_DIRS})
+  target_link_libraries (nori ${png++_LIBRARIES})
+  target_link_libraries (warptest ${png++_LIBRARIES})
+
+  # target_link_libraries(wikidata ${ext/png++_LIBRARIES})
+  MESSAGE( STATUS "PNG++ found!")
+endif(PNG_FOUND)    
 
 # vim: set et ts=2 sw=2 ft=cmake nospell:

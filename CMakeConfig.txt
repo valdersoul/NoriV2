@@ -127,6 +127,12 @@ ExternalProject_Add(nanogui_p
   CMAKE_ARGS      ${CMAKE_EXTERNAL_ARGUMENTS}
 )
 
+# Build pngPlusPlus
+#find_package(PNG REQUIRED)
+#include_directories(${PNG_INCLUDE_DIR})
+#include_directories(${CMAKE_SOURCE_DIR}/ext/png++)
+#source_group("ext\\png++" FILES ${PNGPP_SRC})
+
 # Compile Nori with compiler warnings turned on
 if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -151,6 +157,7 @@ include_directories(
   ext/pugixml/src
   ext/hypothesis
   ext/filesystem
+  ext/png++
   include
 )
 
