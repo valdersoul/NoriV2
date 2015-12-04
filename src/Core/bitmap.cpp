@@ -23,7 +23,8 @@
 #include <ImfStringAttribute.h>
 #include <ImfVersion.h>
 #include <ImfIO.h>
-#include <Magick++.h>
+//#include <Magick++.h>
+#include <png.hpp>
 
 NORI_NAMESPACE_BEGIN
 
@@ -106,6 +107,32 @@ void Bitmap::save(const std::string &filename) {
 }
 
 void Bitmap::savePNG(const std::string &filename) {
+    png::image<png::rgb_pixel> img(cols(), rows());
+
+        for(int i=0;i < rows();i++)
+            for(int j=0;j<cols();j++)
+            {
+                Color4f  curColor = coeffRef(i, j);
+                double r = std::pow(curColor(0), 1.0f / m_gamma);
+                r = r > 1.0d ? 1.0d: r;
+                r = r < 0.0d ? 0.0d: r;
+                double g = std::pow(curColor(1), 1.0f / m_gamma);
+                g = g > 1.0d ? 1.0d: g;
+                g = g < 0.0d ? 0.0d: g;
+                double b = std::pow(curColor(2), 1.0f / m_gamma);
+                b = b > 1.0d ? 1.0d: b;
+                b = b < 0.0d ? 0.0d: b;
+                int iRed = (int) (r * 255.0d);
+                int iGreen = (int) (g * 255.0d);
+                int iBlue = (int) (b * 255.0d);
+                png::rgb_pixel pixel(iRed, iGreen, iBlue);
+                img.set_pixel(j, i, pixel);
+            }
+
+
+        //Write png to file
+        img.write(filename);
+    /*
     const Magick::Geometry size(cols(), rows());
     const Magick::ColorRGB color(0.0, 0.0, 0.0);
     Magick::Image img(size, color);
@@ -137,6 +164,7 @@ void Bitmap::savePNG(const std::string &filename) {
     view.sync();
 
     img.write(filename);
+    */
 
 }
 float Bitmap::getTotalLuminace(){

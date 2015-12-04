@@ -1,55 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e4c34ff3-98e3-4227-9029-46ff1170dce8" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet12.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet13.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet14.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet15.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet16.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet17.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet18.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/llmicrofacet19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet12.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet13.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet14.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet15.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet16.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet17.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet18.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/microfacet19.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet0.png" afterPath="$PROJECT_DIR$/images/llmicrofacet0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet1.png" afterPath="$PROJECT_DIR$/images/llmicrofacet1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet10.png" afterPath="$PROJECT_DIR$/images/llmicrofacet10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet11.png" afterPath="$PROJECT_DIR$/images/llmicrofacet11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet2.png" afterPath="$PROJECT_DIR$/images/llmicrofacet2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet3.png" afterPath="$PROJECT_DIR$/images/llmicrofacet3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet4.png" afterPath="$PROJECT_DIR$/images/llmicrofacet4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet5.png" afterPath="$PROJECT_DIR$/images/llmicrofacet5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet6.png" afterPath="$PROJECT_DIR$/images/llmicrofacet6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet7.png" afterPath="$PROJECT_DIR$/images/llmicrofacet7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet8.png" afterPath="$PROJECT_DIR$/images/llmicrofacet8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet9.png" afterPath="$PROJECT_DIR$/images/llmicrofacet9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet0.png" afterPath="$PROJECT_DIR$/images/microfacet0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet1.png" afterPath="$PROJECT_DIR$/images/microfacet1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet10.png" afterPath="$PROJECT_DIR$/images/microfacet10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet11.png" afterPath="$PROJECT_DIR$/images/microfacet11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet2.png" afterPath="$PROJECT_DIR$/images/microfacet2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet3.png" afterPath="$PROJECT_DIR$/images/microfacet3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet4.png" afterPath="$PROJECT_DIR$/images/microfacet4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet5.png" afterPath="$PROJECT_DIR$/images/microfacet5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet6.png" afterPath="$PROJECT_DIR$/images/microfacet6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet7.png" afterPath="$PROJECT_DIR$/images/microfacet7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet8.png" afterPath="$PROJECT_DIR$/images/microfacet8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet9.png" afterPath="$PROJECT_DIR$/images/microfacet9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/layerlab.so" afterPath="$PROJECT_DIR$/layerlab.so" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BSDFFourier.py" afterPath="$PROJECT_DIR$/BSDFFourier.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame.py" afterPath="$PROJECT_DIR$/frame.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/layer.py" afterPath="$PROJECT_DIR$/layer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/microfacet.py" afterPath="$PROJECT_DIR$/microfacet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testLayer.py" afterPath="$PROJECT_DIR$/testLayer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testMicrofacetfAll.py" afterPath="$PROJECT_DIR$/testMicrofacetfAll.py" />
-    </list>
+    <list default="true" id="e4c34ff3-98e3-4227-9029-46ff1170dce8" name="Default" comment="" />
     <ignored path="python.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
