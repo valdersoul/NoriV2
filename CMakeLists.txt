@@ -222,12 +222,12 @@ if(PNG_FOUND)
   set(png++_INCLUDE_DIRS ${png++_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
   # ext/png++ is a header-only program, so no libraries of its own.
   set(png++_LIBRARIES ${PNG_LIBRARIES})
-  MESSAGE( STATUS ${png++_INCLUDE_DIRS})
   include_directories(${png++_INCLUDE_DIRS})
   target_link_libraries (nori ${png++_LIBRARIES})
   target_link_libraries (warptest ${png++_LIBRARIES})
 
   # target_link_libraries(wikidata ${ext/png++_LIBRARIES})
+  MESSAGE(STATUS "PNG version: "${PNG_VERSION_STRING})
   MESSAGE( STATUS "PNG++ found!")
 endif(PNG_FOUND)    
 
