@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 import layerlab as ll
 import numpy as np
 
-n = 128
-mu, w = gausLobatto(n)
+n = 64
+mu, w = gausLobatto(n) #Valid
+
 
 m = 12
 eta = complex(1.1, 0.0)
@@ -15,20 +16,28 @@ run = 2
 if run == 1:
     diffuseLayer = layer(mu, w, m)
     diffuseLayer.setDiffuse(0.8)
+    temp = diffuseLayer.scatteringMatrix[:, :, 0]
+    resHalf = n / 2
+    #temp[resHalf:, :resHalf] = np.fliplr(temp[resHalf:, :resHalf])
+    #temp[:resHalf, resHalf:] = np.flipud(temp[:resHalf, resHalf:])
     plt.figure()
-    plt.imshow(diffuseLayer.scatteringMatrix[:, :, 0])
+    plt.imshow(temp)
     plt.savefig('images/diffuse' + str(0) + '.png')
 
     diffuseLayer = ll.Layer(mu, w, m)
     diffuseLayer.setDiffuse(0.8)
     i = 0
-    topRow = np.concatenate((diffuseLayer[i].transmissionBottomTop, diffuseLayer[i].reflectionTop), axis=1)
-    bottomRow = np.concatenate((diffuseLayer[i].reflectionBottom, diffuseLayer[i].transmissionTopBottom), axis=1)
+    topRow = np.concatenate((diffuseLayer[i].transmissionTopBottom, diffuseLayer[i].reflectionBottom), axis=1)
+    bottomRow = np.concatenate((diffuseLayer[i].reflectionTop, diffuseLayer[i].transmissionBottomTop), axis=1)
     SM = np.concatenate((topRow, bottomRow), axis=0)
 
     plt.figure()
     plt.imshow(SM)
     plt.savefig('images/lldiffuse' + str(i) + '.png')
+    plt.figure()
+    plt.imshow(np.abs(SM - temp))
+    plt.savefig('images/zerrdiffuse' + str(i) + '.png')
+    print(np.sum(np.abs(SM - temp)))
 
 elif run == 2:
 
@@ -39,16 +48,33 @@ elif run == 2:
     for i in range(m):
         print(i)
         plt.figure()
-        plt.imshow(coating.scatteringMatrix[:, :, i], cmap=plt.get_cmap('gray'))
+        temp = coating.scatteringMatrix[:, :, i]
+        resHalf = n / 2
+        #temp[resHalf:, :resHalf] = np.fliplr(temp[resHalf:, :resHalf])
+        #temp[:resHalf, resHalf:] = np.flipud(temp[:resHalf, resHalf:])
+        plt.imshow(temp, cmap=plt.get_cmap('gray'))
         plt.savefig('images/microfacet' + str(i) + '.png')
 
-    coating = ll.Layer(mu, w, m)
-    coating.setMicrofacet(eta=eta, alpha=alpha)
+
+    coatingll = ll.Layer(mu, w, m)
+    coatingll.setMicrofacet(eta=eta, alpha=alpha)
     for i in range(m):
-        topRow = np.concatenate((coating[i].transmissionBottomTop, coating[i].reflectionTop), axis=1)
-        bottomRow = np.concatenate((coating[i].reflectionBottom, coating[i].transmissionTopBottom), axis=1)
+        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
+        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
         SM = np.concatenate((topRow, bottomRow), axis=0)
+
 
         plt.figure()
         plt.imshow(SM, cmap=plt.get_cmap('gray'))
         plt.savefig('images/llmicrofacet' + str(i) + '.png')
+
+    for i in range(m):
+        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
+        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
+        SM = np.concatenate((topRow, bottomRow), axis=0)
+        temp = coating.scatteringMatrix[:, :, i]
+        plt.figure()
+        plt.imshow(np.abs(SM - temp))
+        plt.savefig('images/errmicrofacet' + str(i) + '.png')
+        print(np.sum(np.abs(SM - temp)))
+

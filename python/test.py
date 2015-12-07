@@ -44,4 +44,7 @@ for k in xRange:
 
 plt.figure()
 plt.plot(xRange, errList)
-plt.savefig("Graph.pdf")
+plt.ylabel('abs(HG - HGAPProx_k)')
+plt.xlabel('k - #coefficients')
+plt.title('HenyeyGreenstein Fourier approximation')
+plt.savefig("Graph.png")

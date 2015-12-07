@@ -32,24 +32,28 @@ for i in range(n):
 
 quickTest = ll.microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
 quickTest2 = microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
-cOrig = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
-c = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n)
+cLL = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
+cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n)
 cnoExp = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, nCoeffb, np.pi)
 
-print("Our coeff: " + str(len(c)))
-print("ll coeff: " + str(len(cOrig)))
+print("Our coeff: " + str(len(cOur)))
+print("ll coeff: " + str(len(cLL)))
 
 plt.figure()
-plt.plot(cOrig, 'b')
-plt.plot(c, 'r--')
+plt.plot(cOur, 'b')
+plt.plot(cLL, 'r--')
 plt.savefig("Coeff.pdf")
 
-yOrig = fourierEval(cOrig, phi)
-y = fourierEval(c, phi)
+yOur = fourierEval(cOur, phi)
+
+yLL = ll.microfacet(mu_o, mu_i, etaC, alpha, phi)
 
 plt.figure()
-plt.plot(phi, yOrig, 'b')
-plt.plot(phi, y, 'r--')
-plt.title("for the high frequency")
-plt.savefig("MicrofacetgraphAll.pdf")
+plt.plot(phi, yOur, 'b')
+plt.plot(phi, yLL, 'r--')
+plt.ylabel('Value')
+plt.xlabel('Phi_d')
+plt.title('Microfacet fourier approximation')
+plt.legend(['Fourier approximation', 'Orignal function'])
+plt.savefig("MicrofacetgraphAll.png")
 
