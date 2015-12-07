@@ -5,7 +5,7 @@ project("nori")
 # This file included below takes care of compiling dependencies
 # and setting compiler flags on different platforms
 include("CMakeConfig.txt")
-
+include_directories(BEFORE SYSTEM /usr/include/libpng12/)
 # The following lines build the main executable. If you add a source
 # code file to Nori, be sure to include it in this list.
 add_executable(nori
@@ -140,7 +140,7 @@ add_executable(nori
   src/Warp/HSWrapper.cpp
   src/Warp/warp.cpp
   src/Warp/Schlick.cpp
-  
+
 
 )
 
@@ -182,38 +182,39 @@ target_link_libraries(warptest ${extra_libs})
 #    MESSAGE( STATUS "ImageMagick found!")
 #endif (ImageMagick_FOUND)
 
-# find png 
-find_package(PNG REQUIRED)
-if(PNG_FOUND)    
+# find png
+target_link_libraries (nori png12)
+find_package(PNG 1.2  REQUIRED)
+if(PNG_FOUND)
     find_path(png++_INCLUDE_DIR
-      NAMES   
-        color.hpp  
-        config.hpp  
-        consumer.hpp  
+      NAMES
+        color.hpp
+        config.hpp
+        consumer.hpp
         convert_color_space.hpp
-        end_info.hpp  
-        error.hpp  
-        ga_pixel.hpp  
+        end_info.hpp
+        error.hpp
+        ga_pixel.hpp
         generator.hpp
-        gray_pixel.hpp  
-        image.hpp  
-        image_info.hpp  
+        gray_pixel.hpp
+        image.hpp
+        image_info.hpp
         index_pixel.hpp
-        info.hpp  
-        info_base.hpp  
-        io_base.hpp  
+        info.hpp
+        info_base.hpp
+        io_base.hpp
         packed_pixel.hpp
-        palette.hpp  
-        pixel_buffer.hpp  
-        pixel_traits.hpp  
+        palette.hpp
+        pixel_buffer.hpp
+        pixel_traits.hpp
         png.hpp
-        reader.hpp  
-        require_color_space.hpp  
-        rgb_pixel.hpp  
+        reader.hpp
+        require_color_space.hpp
+        rgb_pixel.hpp
         rgba_pixel.hpp
-        streaming_base.hpp  
-        tRNS.hpp  
-        types.hpp  
+        streaming_base.hpp
+        tRNS.hpp
+        types.hpp
         writer.hpp
       PATHS
         ${CMAKE_SOURCE_DIR}/ext/png++
@@ -227,8 +228,7 @@ if(PNG_FOUND)
   target_link_libraries (warptest ${png++_LIBRARIES})
 
   # target_link_libraries(wikidata ${ext/png++_LIBRARIES})
-  MESSAGE(STATUS "PNG version: "${PNG_VERSION_STRING})
   MESSAGE( STATUS "PNG++ found!")
-endif(PNG_FOUND)    
+  endif(PNG_FOUND)
 
 # vim: set et ts=2 sw=2 ft=cmake nospell:
