@@ -10,3 +10,4 @@ Makefile
 /scenes
 *.pyc
 python/.idea/*
+CMakeLists.txt.user

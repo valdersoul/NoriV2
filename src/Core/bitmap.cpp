@@ -107,6 +107,7 @@ void Bitmap::save(const std::string &filename) {
 }
 
 void Bitmap::savePNG(const std::string &filename) {
+    cout << "{\"message\":\"update\"}" << endl;
     png::image<png::rgb_pixel> img(cols(), rows());
 
         for(int i=0;i < rows();i++)
