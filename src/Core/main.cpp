@@ -27,12 +27,14 @@
 #include <nori/gui.h>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
+#include <tbb/queuing_mutex.h>
 #include <filesystem/resolver.h>
 #include <thread>
 #include <tbb/task_scheduler_init.h>
 #include <stdlib.h>
 
 using namespace nori;
+typedef tbb::queuing_mutex Mutex;
 
 
 static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block) {
@@ -113,13 +115,17 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                 BlockGenerator blockGenerator(outputSize, NORI_BLOCK_SIZE);
 
                 tbb::task_scheduler_init init(nrThreads);
-                tbb::blocked_range<int> range(0, blockGenerator.getBlockCount());
+                int blockCount = blockGenerator.getBlockCount();
+                int procentDone = 0;
+                tbb::blocked_range<int> range(0, blockCount);
 
                 auto map = [&](const tbb::blocked_range<int> &range) {
                     /* Allocate memory for a small image block to be rendered
                        by the current thread */
                     ImageBlock block(Vector2i(NORI_BLOCK_SIZE),
                         camera->getReconstructionFilter());
+                    Mutex mutex;
+
 
 
                     /* Create a clone of the sampler for the current thread */
@@ -139,10 +145,12 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                            the "big" block that represents the entire image */
                         result.put(block);
                         if(saveEveryStep) {
+                            Mutex::scoped_lock lock(mutex);
                             std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
                             /* Save using the png format */
-                            bitmap->savePNG(outputNamePNG);
+                            bitmap->savePNG(outputNamePNG, int(100.0f * float(procentDone) / float(blockCount)));
+                            procentDone++;
                         }
                     }
                 };

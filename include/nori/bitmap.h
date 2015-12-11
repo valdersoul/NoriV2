@@ -49,7 +49,7 @@ public:
     void save(const std::string &filename);
 
     /// Save the bitmap as an PNG file with the specified filename
-    void savePNG(const std::string &filename);
+    void savePNG(const std::string &filename, const int percent);
 
 
     float getTotalLuminace();

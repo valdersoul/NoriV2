@@ -106,8 +106,9 @@ void Bitmap::save(const std::string &filename) {
     file.writePixels((int) rows());
 }
 
-void Bitmap::savePNG(const std::string &filename) {
-    cout << "{\"message\":\"update\"}" << endl;
+void Bitmap::savePNG(const std::string &filename, const int percent) {
+    cout << "{\"percentage\" : " << percent << "}" << endl;
+    cout.flush();
     png::image<png::rgb_pixel> img(cols(), rows());
 
         for(int i=0;i < rows();i++)
