@@ -115,60 +115,40 @@ void Bitmap::savePNG(const std::string &filename, const int percent) {
             for(int j=0;j<cols();j++)
             {
                 Color4f  curColor = coeffRef(i, j);
-                double r = std::pow(curColor(0), 1.0f / m_gamma);
-                r = r > 1.0d ? 1.0d: r;
-                r = r < 0.0d ? 0.0d: r;
-                double g = std::pow(curColor(1), 1.0f / m_gamma);
-                g = g > 1.0d ? 1.0d: g;
-                g = g < 0.0d ? 0.0d: g;
-                double b = std::pow(curColor(2), 1.0f / m_gamma);
-                b = b > 1.0d ? 1.0d: b;
-                b = b < 0.0d ? 0.0d: b;
-                int iRed = (int) (r * 255.0d);
-                int iGreen = (int) (g * 255.0d);
-                int iBlue = (int) (b * 255.0d);
-                png::rgb_pixel pixel(iRed, iGreen, iBlue);
+                png::rgb_pixel pixel((int) (clamp(std::pow(curColor(0), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f),
+                                     (int) (clamp(std::pow(curColor(1), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f),
+                                     (int) (clamp(std::pow(curColor(2), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f));
                 img.set_pixel(j, i, pixel);
             }
 
 
         //Write png to file
         img.write(filename);
-    /*
-    const Magick::Geometry size(cols(), rows());
-    const Magick::ColorRGB color(0.0, 0.0, 0.0);
-    Magick::Image img(size, color);
-
-    // Allocate pixel view
-    Magick::Pixels view(img);
-
-    Magick::PixelPacket *pixels = view.get(0, 0, cols(), rows());
-
-    for ( ssize_t row = 0; row < rows() ; ++row )
-       for ( ssize_t column = 0; column < cols() ; ++column ) {
-            Color4f  curColor = coeffRef(row, column);
-            double r = std::pow(curColor(0), 1.0f / m_gamma);
-            r = r > 1.0d ? 1.0d: r;
-            r = r < 0.0d ? 0.0d: r;
-            double g = std::pow(curColor(1), 1.0f / m_gamma);
-            g = g > 1.0d ? 1.0d: g;
-            g = g < 0.0d ? 0.0d: g;
-            double b = std::pow(curColor(2), 1.0f / m_gamma);
-            b = b > 1.0d ? 1.0d: b;
-            b = b < 0.0d ? 0.0d: b;
-
-            Magick::ColorRGB curColorMagick(r, g, b);
-            *pixels++=curColorMagick;
-       }
-
-
-    // Save changes to image.
-    view.sync();
-
-    img.write(filename);
-    */
-
 }
+void Bitmap::printB64Encoded(const std::string &tempFilename, const Vector2i &glbSize, const Vector2i &offset, const int percent) {
+    png::image<png::rgb_pixel> img(cols(), rows());
+
+        for(int i=0;i < rows();i++)
+            for(int j=0;j<cols();j++)
+            {
+                Color4f  curColor = coeffRef(i, j);
+                png::rgb_pixel pixel((int) (clamp(std::pow(curColor(0), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f),
+                                     (int) (clamp(std::pow(curColor(1), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f),
+                                     (int) (clamp(std::pow(curColor(2), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f));
+                img.set_pixel(j, i, pixel);
+            }
+    //ToDo write function convert the image to base64 data @Markus
+    std::string b64imgData;
+
+    cout << "{\"percentage\" : " << percent << ",";
+    cout << "\"x\" : " << offset(0) << ",";
+    cout << "\"y\" : " << offset(1) << ",";
+    cout << "\"width\" : " << glbSize(0) << ",";
+    cout << "\"height\" : " << glbSize(1) << ",";
+    cout << "\"data\" : data:image/jpeg;base64," << b64imgData << "}" << endl;
+    cout.flush();
+}
+
 float Bitmap::getTotalLuminace(){
     Color3f totalColor = sum();
 

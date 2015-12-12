@@ -51,6 +51,8 @@ public:
     /// Save the bitmap as an PNG file with the specified filename
     void savePNG(const std::string &filename, const int percent);
 
+    void printB64Encoded(const std::string &tempFilename, const Vector2i &glbSize, const Vector2i &offset, const int percent);
+
 
     float getTotalLuminace();
 
