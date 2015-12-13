@@ -107,8 +107,8 @@ void Bitmap::save(const std::string &filename) {
 }
 
 void Bitmap::savePNG(const std::string &filename, const int percent) {
-    cout << "{\"percentage\" : " << percent << "}" << endl;
-    cout.flush();
+    //cout << "{\"percentage\" : " << percent << "}" << endl;
+    //cout.flush();
     png::image<png::rgb_pixel> img(cols(), rows());
 
         for(int i=0;i < rows();i++)
@@ -125,7 +125,7 @@ void Bitmap::savePNG(const std::string &filename, const int percent) {
         //Write png to file
         img.write(filename);
 }
-void Bitmap::printB64Encoded(const std::string &tempFilename, const Vector2i &glbSize, const Vector2i &offset, const int percent) {
+void Bitmap::printB64Encoded(const Vector2i &glbSize, const Vector2i &lclSize, const Point2i &offset, const int percent) {
     png::image<png::rgb_pixel> img(cols(), rows());
 
         for(int i=0;i < rows();i++)
@@ -145,7 +145,9 @@ void Bitmap::printB64Encoded(const std::string &tempFilename, const Vector2i &gl
     cout << "\"y\" : " << offset(1) << ",";
     cout << "\"width\" : " << glbSize(0) << ",";
     cout << "\"height\" : " << glbSize(1) << ",";
-    cout << "\"data\" : data:image/jpeg;base64," << b64imgData << "}" << endl;
+    cout << "\"patchWidth\" : " << lclSize(0) << ",";
+    cout << "\"patchHeight\" : " << lclSize(1) << ",";
+    cout << "\"data\" : data:image/png;base64," << b64imgData << "}" << endl;
     cout.flush();
 }
 

@@ -116,7 +116,7 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
 
                 tbb::task_scheduler_init init(nrThreads);
                 int blockCount = blockGenerator.getBlockCount();
-                int procentDone = 0;
+                int percent = 0;
                 tbb::blocked_range<int> range(0, blockCount);
 
                 auto map = [&](const tbb::blocked_range<int> &range) {
@@ -146,11 +146,17 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                         result.put(block);
                         if(saveEveryStep) {
                             Mutex::scoped_lock lock(mutex);
-                            std::unique_ptr<Bitmap> bitmap(result.toBitmap());
 
                             /* Save using the png format */
-                            bitmap->savePNG(outputNamePNG, int(100.0f * float(procentDone) / float(blockCount)));
-                            procentDone++;
+                            std::unique_ptr<Bitmap> bitmap(result.toBitmap());
+                            bitmap->savePNG(outputNamePNG, int(100.0f * float(percent) / float(blockCount)));
+
+                            std::unique_ptr<Bitmap> blockBitmap(block.toBitmap());
+
+                            /* print the data as base64 string*/
+                            blockBitmap->printB64Encoded(result.getSize(), block.getSize(), block.getOffset(), int(100.0f * float(percent) / float(blockCount)));
+
+                            percent++;
                         }
                     }
                 };
