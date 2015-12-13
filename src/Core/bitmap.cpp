@@ -147,7 +147,7 @@ void Bitmap::printB64Encoded(const Vector2i &glbSize, const Vector2i &lclSize, c
     cout << "\"height\" : " << glbSize(1) << ",";
     cout << "\"patchWidth\" : " << lclSize(0) << ",";
     cout << "\"patchHeight\" : " << lclSize(1) << ",";
-    cout << "\"data\" : data:image/png;base64," << b64imgData << "}" << endl;
+    cout << "\"data\" : \"data:image/png;base64," << b64imgData << "\"}" << endl;
     cout.flush();
 }
 
