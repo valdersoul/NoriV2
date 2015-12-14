@@ -147,10 +147,6 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
                         if(saveEveryStep) {
                             Mutex::scoped_lock lock(mutex);
 
-                            /* Save using the png format */
-                            std::unique_ptr<Bitmap> bitmap(result.toBitmap());
-                            bitmap->savePNG(outputNamePNG, int(100.0f * float(percent) / float(blockCount)));
-
                             std::unique_ptr<Bitmap> blockBitmap(block.toBitmap());
 
                             /* print the data as base64 string*/
@@ -172,6 +168,9 @@ static void render(Scene *scene, const std::string &filename, const int nrThread
 
                 /* Save using the OpenEXR format */
                 bitmap->save(outputName);
+
+                /* Save using the OpenEXR format */
+                bitmap->savePNG(outputNamePNG, 100);
             }
         // DOES THE RENDERER WANT TO CONTINUE WITH DIFFERENT SETTINGS?
         // EXAMPLE - RADIUS CHANGE FOR PHOTON MAPPING
