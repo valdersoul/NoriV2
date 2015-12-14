@@ -17,6 +17,7 @@
 */
 
 #include <nori/bitmap.h>
+#include <nori/common.h>
 #include <ImfInputFile.h>
 #include <ImfOutputFile.h>
 #include <ImfChannelList.h>
@@ -25,6 +26,7 @@
 #include <ImfIO.h>
 //#include <Magick++.h>
 #include <png.hpp>
+#include <iostream>
 
 NORI_NAMESPACE_BEGIN
 
@@ -137,8 +139,12 @@ void Bitmap::printB64Encoded(const Vector2i &glbSize, const Vector2i &lclSize, c
                                      (int) (clamp(std::pow(curColor(2), 1.0f / m_gamma), 0.0f, 1.0f) * 255.0f));
                 img.set_pixel(j, i, pixel);
             }
+    std::ostringstream buf;
+    img.write_stream(buf);
+    const std::string s = buf.str();
+
     //ToDo write function convert the image to base64 data @Markus
-    std::string b64imgData;
+    std::string b64imgData = base64_encode(reinterpret_cast<unsigned char const*>(s.c_str()), s.length());
 
     cout << "{\"percentage\" : " << percent << ",";
     cout << "\"x\" : " << offset(0) << ",";

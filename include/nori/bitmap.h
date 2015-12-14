@@ -53,7 +53,6 @@ public:
 
     void printB64Encoded(const Vector2i &glbSize, const Vector2i &lclSize, const Point2i &offset, const int percent);
 
-
     float getTotalLuminace();
 
     Bitmap(Eigen::Array<Color3f, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> other)

@@ -34,6 +34,7 @@
 #include <stdint.h>
 #include <ImathPlatform.h>
 #include <tinyformat.h>
+#include <string>
 
 /* Convenience definitions */
 #define NORI_NAMESPACE_BEGIN namespace nori {
@@ -288,6 +289,10 @@ extern float conductorReflectance(float cosThetaI, float eta, float k);
  */
 extern filesystem::resolver *getFileResolver();
 
+
+extern std::string base64_encode(unsigned char const* , unsigned int len);
+
+extern std::string base64_decode(std::string const& s);
 NORI_NAMESPACE_END
 
 #endif /* __NORI_COMMON_H */
