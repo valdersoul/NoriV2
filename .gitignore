@@ -10,3 +10,4 @@ Makefile
 /scenes
 *.pyc
 python/.idea/*
+python/images/*
