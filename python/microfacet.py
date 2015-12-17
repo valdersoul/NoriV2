@@ -6,6 +6,8 @@ from BSDFFourier import expcos_fseries, fseries_convolve, expcosCoefficientCount
 from filon import filonIntegrate
 import scipy.special as sp
 import sys
+from scipy.linalg import svd
+
 
 
 def fresnelDielectric(cosThetaI_, cosThetaT_, eta):
@@ -83,9 +85,10 @@ def smithG1(v, m, alpha):
 def getAB(mu_i, mu_o, eta, alpha):
     reflect = (-mu_i * mu_o) > 0
     sinMu2 = f.safe_sqrt((1.0 - mu_i * mu_i) * (1.0 - mu_o * mu_o))
+
     if reflect:
         temp = 1.0 / (alpha * (mu_i - mu_o))
-        A = (mu_i * mu_i + mu_o * mu_o - 2) * temp * temp
+        A = (mu_i * mu_i + mu_o * mu_o - 2.0) * temp * temp
         B = 2.0 * sinMu2 * temp * temp
     else:
         temp = 1.0 / (alpha * (mu_i - eta.real * mu_o))
@@ -169,12 +172,12 @@ def Bmax(n, relerr):
 def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
     # const
     nEvals = 200
-    eps = 10e-4
+    eps = sys.float_info.epsilon
 
     def foo(a):
         return microfacetNoExp(mu_o, mu_i, etaC, alpha, a)
 
-    reflect = - mu_o * mu_i > 0.0
+    reflect = - mu_i * mu_o > 0.0
     sinMu2 = f.safe_sqrt((1.0 - mu_i * mu_i) * (1.0 - mu_o * mu_o))
     phiCritical = 0.0
     conductor = etaC.imag != 0.0
@@ -187,6 +190,7 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
     if reflect:
         if not conductor:
             if sinMu2 == 0:
+                print("reflect sinMu2 == 0")
                 temp = -1.0
             else:
                 temp = (2.0 * eta.real * eta.real - mu_i * mu_o - 1.0) / sinMu2
@@ -197,45 +201,104 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         else:
             etaDenser = 1.0 / eta.real
         if sinMu2 == 0:
+            print("refract sinMu2 == 0")
             temp = -1.0
         else:
             temp = (1.0 - etaDenser * mu_i * mu_o) / (etaDenser * sinMu2)
         phiCritical = f.safe_acos(temp)
-
+    if not conductor and phiCritical > eps and phiCritical < np.pi - eps and phiCritical < phiMax - eps:
+        #   Uh oh, some high frequency content leaked in the generally low frequency part.
+        #   Increase the number of coefficients so that we can capture it. Fortunately, this
+        #   happens very rarely.
+        print("Uh oh case")
+        n = max(n, 100)
+    # validated and tested length and value
     if reflect:
         if phiCritical > eps and phiCritical < phiMax - eps:
 
             b1 = filonIntegrate(foo, n, nEvals, 0.0, phiCritical)
             b2 = filonIntegrate(foo, n, nEvals, phiCritical, phiMax)
-            b = np.concatenate((b1, b2), axis=0)
+            coeffs = np.concatenate((b1, b2), axis=0)
         else:
-            b = filonIntegrate(foo, n, nEvals, 0.0, phiMax)
+            coeffs = filonIntegrate(foo, n, nEvals, 0.0, phiMax)
     else:
-        b = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax))
+        coeffs = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax))
 
-    # ToDo: if (phiMax < math::Pi - math::Epsilon) SVD stuff
-    return b
+    if phiMax < np.pi - eps:
+        #  /* Precompute some sines and cosines */
+        cosPhi = np.zeros(n)
+        sinPhi = np.zeros(n)
+        for i in range(n):
+            sinPhi[i] = np.sin(i * phiMax)
+            cosPhi[i] = np.cos(i * phiMax)
+        # tested and validated values over sum
+        A = np.zeros((n, n))
+        for i in range(n):
+            for j in range(i + 1):
+                if i != j:
+                    A[i, j] = A[j, i] = (i * cosPhi[j] * sinPhi[i] - j * cosPhi[i] * sinPhi[j]) / (i * i - j * j)
+                elif i != 0:
+                    A[i, i] = (np.sin(2.0 * i * phiMax) + 2.0 * i * phiMax) / (4.0 * i)
+                else:
+                    A[i, i] = phiMax
+
+        U, sigma, V = svd(A)
+        V = V.T
+
+        if sigma[0] == 0:
+            return [0.0]
+
+        temp = np.zeros(n)
+        coeffs[0] *= np.pi
+        coeffs[1:n] *= 0.5 * np.pi
+        for i in range(n):
+            if sigma[i] < 1e-9 * sigma[0]:
+                break
+            if len(coeffs) == len(U[:, i]):
+                temp += V[:, i] * np.dot(U[:, i], coeffs) / sigma[i]
+            else:
+                print("Error shapes doesnt match")
+                print("len(coeffs)" + str(len(coeffs)))
+                print("len(U[:, i])" + str(len(U[:, i])))
+        coeffs = temp
+
+    return coeffs
 
 
 def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
-    A, B = getAB(mu_i, mu_o, etaC, alpha)
+    conductor = (etaC.imag != 0.0)
+    reflect = - mu_o * mu_i > 0.0
 
-    if sp.i0e(B) * np.exp(A+B) < 1e-10:
+    # numerical errors
+    if conductor and not reflect:
         return [0.0]
 
+    # validated visual
+    A, B = getAB(mu_i, mu_o, etaC, alpha)
+
+    # validate and tested
+    if sp.i0e(B) * np.exp(A + B) < 1e-10:
+        return [0.0]
+
+    # validated visual
     B_max = Bmax(n, relerr)
     if B > B_max:
         A = A + B - B_max + math.log(sp.i0e(B) / sp.i0e(B_max))
         B = B_max
 
+    # validated and tested with length and value
     expcos_coeffs = expcos_fseries(A, B, relerr)
+
     if B == 0.0:
         phiMax = f.safe_acos(-1.0)
     else:
         phiMax = f.safe_acos(1.0 + np.log(relerr) / B)
 
+    # validated length value is 0.00264447443559 PROBELM IS THE SVD computation
+
     lowfreq_coeffs = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, 12, phiMax)
 
+    # valid?
     result = fseries_convolve(lowfreq_coeffs, len(lowfreq_coeffs), expcos_coeffs, len(expcos_coeffs))
 
     for i in range(len(result)):

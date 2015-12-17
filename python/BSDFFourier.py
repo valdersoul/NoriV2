@@ -23,21 +23,21 @@ def fseries_convolve(a, ka, b, kb):
     return c
 
 
-def mbessel_ratio(k, B):
+def mbessel_ratio(B, k):
     if B == 0 and k == 0:
         # python hack
         return 1.0
-    eps = 10e-4
+    eps = sys.float_info.epsilon
     invTwoB = 2.0 / B
     i = k
     D = 1.0 / (invTwoB * i)
-    i += 1.0
+    i += 1
     Cd = D
     C = Cd
 
     while np.abs(Cd) > eps * np.abs(C):
         coeff = invTwoB * i
-        i += 1.0
+        i += 1
         D = 1.0 / (D + coeff)
         Cd *= coeff * D - 1.0
         C += Cd
@@ -46,14 +46,18 @@ def mbessel_ratio(k, B):
 
 
 def expcos_fseries(A, B, relerr):
+    # validate and tested
     m = expcosCoefficientCount(B, relerr)
     coeffs = np.zeros(m)
+
     # /* Determine the last ratio and work downwards */
     coeffs[m - 1] = mbessel_ratio(B, m - 1)
+
     for i in range(m - 2, 0, -1):
         coeffs[i] = B / (2 * i + B * coeffs[i + 1])
         # /* Evaluate the exponentially scaled I0 and correct scaling */
     coeffs[0] = np.exp(A + B) * sp.i0e(B)
+
     # /* Apply the ratios & factor of two upwards */
     prod = 2 * coeffs[0]
     for i in range(1, m):
@@ -62,6 +66,8 @@ def expcos_fseries(A, B, relerr):
             coeffs = coeffs[:i]
             break
         coeffs[i] = prod
+
+
 
     return coeffs
 

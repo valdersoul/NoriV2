@@ -52,29 +52,36 @@ elif run == 2:
         resHalf = n / 2
         #temp[resHalf:, :resHalf] = np.fliplr(temp[resHalf:, :resHalf])
         #temp[:resHalf, resHalf:] = np.flipud(temp[:resHalf, resHalf:])
-        plt.imshow(temp, cmap=plt.get_cmap('gray'))
+        plt.imshow(temp)
         plt.savefig('images/microfacet' + str(i) + '.png')
 
 
     coatingll = ll.Layer(mu, w, m)
-    coatingll.setMicrofacet(eta=eta, alpha=alpha)
+    coatingll.setMicrofacet(eta=eta, alpha=alpha, conserveEnergy=False)
     for i in range(m):
-        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
-        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
-        SM = np.concatenate((topRow, bottomRow), axis=0)
+        SM = coatingll.matrix(i)
 
 
         plt.figure()
-        plt.imshow(SM, cmap=plt.get_cmap('gray'))
+        plt.imshow(SM)
         plt.savefig('images/llmicrofacet' + str(i) + '.png')
 
     for i in range(m):
-        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
-        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
-        SM = np.concatenate((topRow, bottomRow), axis=0)
+        #topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
+        #bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
+        #SM = np.concatenate((topRow, bottomRow), axis=0)
+        SM = coatingll.matrix(i)
         temp = coating.scatteringMatrix[:, :, i]
         plt.figure()
         plt.imshow(np.abs(SM - temp))
         plt.savefig('images/errmicrofacet' + str(i) + '.png')
-        print(np.sum(np.abs(SM - temp)))
+        # compute quartet errrors
+        TtbErr = np.sum(np.abs(coating.getTtb(i) - coatingll[i].transmissionTopBottom))
+        RbErr = np.sum(np.abs(coating.getRb(i) - coatingll[i].reflectionBottom))
+        Rt = np.sum(np.abs(coating.getRt(i) - coatingll[i].reflectionTop))
+        Tbt = np.sum(np.abs(coating.getTbt(i) - coatingll[i].transmissionBottomTop))
+        globalErr = np.sum(np.abs(SM - temp))
+        print("Global = " + str(globalErr))
+        print (str(TtbErr) + ", " + str(RbErr))
+        print (str(Rt) + ", " + str(TtbErr))
 

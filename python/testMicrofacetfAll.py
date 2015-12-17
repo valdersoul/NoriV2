@@ -30,11 +30,9 @@ for i in range(n):
     curPhi = phi[i]
     y[i] = microfacetNoExp(mu_o, mu_i, etaC, alpha, curPhi)
 
-quickTest = ll.microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
-quickTest2 = microfacetFourierSeries(1.0, 1.0, etaC, alpha, n, 10e-4)
+
 cLL = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
-cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n)
-cnoExp = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, nCoeffb, np.pi)
+cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
 
 print("Our coeff: " + str(len(cOur)))
 print("ll coeff: " + str(len(cLL)))
@@ -43,6 +41,12 @@ plt.figure()
 plt.plot(cOur, 'b')
 plt.plot(cLL, 'r--')
 plt.savefig("Coeff.pdf")
+if len(cOur) == len(cLL):
+    print("absolute error = " + str(np.sum(np.abs(cOur - cLL ))))
+else:
+    print("len(expcos_coeffs) = " + str(len(cOur)))
+    print("len(llexpcos_coeffs) = " + str(len(cLL )))
+
 
 yOur = fourierEval(cOur, phi)
 

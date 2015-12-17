@@ -10,10 +10,11 @@ class layer:
         self.modes = m
         self.scatteringMatrix = None
 
-        nHalf = len(self.weights) / 2
-        #
-        self.weights[:nHalf] = (self.weights[:nHalf])[::-1]
-        self.nodes[:nHalf] = (self.nodes[:nHalf])[::-1]
+        if self.nodes[0] < self.nodes[1]:
+            nHalf = len(self.weights) / 2
+            #
+            self.weights[:nHalf] = (self.weights[:nHalf])[::-1]
+            self.nodes[:nHalf] = (self.nodes[:nHalf])[::-1]
 
     def resolution(self):
         return len(self.nodes)
@@ -100,10 +101,10 @@ class layer:
         FL = np.zeros((n, n, fourierOrdersTarget))
         for i in range(n):
             for o in range(n):
-                coeffs = ll.microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget,
-                                                    10e-4)
-                # coeffs = microfacetFourierSeries( self.nodes[o],  self.nodes[i], eta, alpha, fourierOrdersTarget)
-                for l in range(len(coeffs[:fourierOrdersTarget])):
+                coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3)
+                #coeffs = ll.microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3) # works good but paper is different
+                #coeffs = microfacetFourierSeries( self.nodes[o],  self.nodes[i], eta, alpha, fourierOrdersTarget)
+                for l in range(min(fourierOrdersTarget, len(coeffs))):
                     FL[o, i, l] = coeffs[l]
 
         self.scatteringMatrix = np.zeros((n, n, fourierOrdersTarget))
