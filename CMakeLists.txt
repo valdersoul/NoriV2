@@ -166,7 +166,9 @@ add_dependencies(nori OpenEXR_p)
 add_dependencies(nori nanogui_p)
 add_dependencies(nori tbb_p)
 add_dependencies(nori pugixml)
-add_dependencies(nori pngPlusPlus_p)
+if(WIN32)
+  add_dependencies(nori zlib_p)
+endif(WIN32)
 add_dependencies(warptest nori)
 
 # Link to dependency libraries
@@ -185,6 +187,7 @@ target_link_libraries(warptest ${extra_libs})
 # find png
 target_link_libraries (nori png12)
 find_package(PNG 1.2  REQUIRED)
+
 if(PNG_FOUND)
     find_path(png++_INCLUDE_DIR
       NAMES
@@ -229,6 +232,6 @@ if(PNG_FOUND)
 
   # target_link_libraries(wikidata ${ext/png++_LIBRARIES})
   MESSAGE( STATUS "PNG++ found!")
-  endif(PNG_FOUND)
+endif(PNG_FOUND)
 
 # vim: set et ts=2 sw=2 ft=cmake nospell:
