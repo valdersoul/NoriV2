@@ -9,27 +9,13 @@ from fourierBasic import fourierEval
 import layerlab as ll
 
 
-n = 1000
-a = 0.0
-b = np.pi
-nCoeffb = 4
-nEvals = 200
-phi = np.linspace(a, b, n)
-y  = np.zeros(n)
-y2  = np.zeros(n)
-mu_i = -0.6
-mu_o = 0.5
-alpha = 0.05
-eta_i = 1.5
-eta_o = 1.0
-eta = eta_i / eta_o
-etaC = complex(eta, 0)
-relerr = 10e-6
+n = 12
+phi = np.linspace(0.0,np.pi, n)
 
-for i in range(n):
-    curPhi = phi[i]
-    y[i] = microfacetNoExp(mu_o, mu_i, etaC, alpha, curPhi)
-
+mu_o = -0.452930232232
+mu_i = -0.024736727622
+alpha = 0.1
+etaC = complex(1.1, 0)
 
 cLL = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
 cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
@@ -42,7 +28,7 @@ plt.plot(cOur, 'b')
 plt.plot(cLL, 'r--')
 plt.savefig("Coeff.pdf")
 if len(cOur) == len(cLL):
-    print("absolute error = " + str(np.sum(np.abs(cOur - cLL ))))
+    print("absolute error = " + str(np.sum(np.abs(np.array(cOur) - np.array(cLL)))))
 else:
     print("len(expcos_coeffs) = " + str(len(cOur)))
     print("len(llexpcos_coeffs) = " + str(len(cLL )))

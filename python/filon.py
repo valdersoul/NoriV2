@@ -2,7 +2,6 @@ import numpy as np
 
 
 def filon(phi, f, lmax, output):
-
     h = phi[1] - phi[0]
     invH = 1 / h
     output[0] += (1.0 / (6.0 * np.pi)) * h * (f[0] + 4 * f[1] + f[2])
@@ -50,6 +49,10 @@ def filon(phi, f, lmax, output):
 
 def filonIntegrate(f, nCoeffs, nEvals, a, b):
     coeffs = np.zeros(nCoeffs)
+    if abs(b - a) < 1e-15:
+        return coeffs
+
+
     if nEvals % 2 == 0:
         nEvals += 1
 

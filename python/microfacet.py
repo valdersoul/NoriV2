@@ -9,7 +9,6 @@ import sys
 from scipy.linalg import svd
 
 
-
 def fresnelDielectric(cosThetaI_, cosThetaT_, eta):
     if eta == 1:
         cosThetaT_ = -cosThetaI_
@@ -72,8 +71,8 @@ def smithG1(v, m, alpha):
     # /* Can't see the back side from the front and vice versa */
     if np.dot(v, m) * f.cosTheta(v) <= 0:
         return 0.0
-    # if alpha * tanTheta == 0.0:
-    #    return 0.0
+    if alpha * tanTheta == 0.0:
+        return 1.0
     a = 1.0 / (alpha * tanTheta)
     if a < 1.6:
         aSqr = a * a
@@ -190,7 +189,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
     if reflect:
         if not conductor:
             if sinMu2 == 0:
-                print("reflect sinMu2 == 0")
+                print("reflect sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
+                      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+                      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
                 temp = -1.0
             else:
                 temp = (2.0 * eta.real * eta.real - mu_i * mu_o - 1.0) / sinMu2
@@ -201,7 +202,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         else:
             etaDenser = 1.0 / eta.real
         if sinMu2 == 0:
-            print("refract sinMu2 == 0")
+            print("refract sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
+                  str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+                  str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
             temp = -1.0
         else:
             temp = (1.0 - etaDenser * mu_i * mu_o) / (etaDenser * sinMu2)
@@ -210,7 +213,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         #   Uh oh, some high frequency content leaked in the generally low frequency part.
         #   Increase the number of coefficients so that we can capture it. Fortunately, this
         #   happens very rarely.
-        print("Uh oh case")
+        print("Uh oh case mu_o = " + str(mu_o) + " mu_i = " +
+              str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+              str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
         n = max(n, 100)
     # validated and tested length and value
     if reflect:
@@ -221,8 +226,13 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
             coeffs = np.concatenate((b1, b2), axis=0)
         else:
             coeffs = filonIntegrate(foo, n, nEvals, 0.0, phiMax)
+
     else:
         coeffs = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax))
+        #minVal = min(phiCritical, phiMax)
+        #print(minVal)
+        #coeffs = ll.fourier.filonIntegrate(foo, n, nEvals, 0.0, minVal)
+        #print(coeffs)
 
     if phiMax < np.pi - eps:
         #  /* Precompute some sines and cosines */
@@ -257,7 +267,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
             if len(coeffs) == len(U[:, i]):
                 temp += V[:, i] * np.dot(U[:, i], coeffs) / sigma[i]
             else:
-                print("Error shapes doesnt match")
+                print("Error shapes doesnt match mu_o = " + str(mu_o) + " mu_i = " +
+                      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+                      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
                 print("len(coeffs)" + str(len(coeffs)))
                 print("len(U[:, i])" + str(len(U[:, i])))
         coeffs = temp
@@ -288,21 +300,24 @@ def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
 
     # validated and tested with length and value
     expcos_coeffs = expcos_fseries(A, B, relerr)
+    #llexpcos_coeffs = ll.expCosFourierSeries(A, B, relerr)
+    #print(np.sum(np.abs(expcos_coeffs -llexpcos_coeffs)))
 
     if B == 0.0:
         phiMax = f.safe_acos(-1.0)
     else:
         phiMax = f.safe_acos(1.0 + np.log(relerr) / B)
 
-    # validated length value is 0.00264447443559 PROBELM IS THE SVD computation
+    # validated length value is 0.00264447443559 PROBLEM IS THE SVD computation
 
     lowfreq_coeffs = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, 12, phiMax)
+
 
     # valid?
     result = fseries_convolve(lowfreq_coeffs, len(lowfreq_coeffs), expcos_coeffs, len(expcos_coeffs))
 
     for i in range(len(result)):
-        if result[i] == 0 or np.abs(result[i]) < result[0] * relerr:
+        if result[i] == 0.0 or np.abs(result[i]) < result[0] * relerr:
             result = result[:i]
             break
 

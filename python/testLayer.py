@@ -67,10 +67,10 @@ elif run == 2:
         plt.savefig('images/llmicrofacet' + str(i) + '.png')
 
     for i in range(m):
-        #topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
-        #bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
-        #SM = np.concatenate((topRow, bottomRow), axis=0)
-        SM = coatingll.matrix(i)
+        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
+        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
+        SM = np.concatenate((topRow, bottomRow), axis=0)
+        #SM = coatingll.matrix(i)
         temp = coating.scatteringMatrix[:, :, i]
         plt.figure()
         plt.imshow(np.abs(SM - temp))
