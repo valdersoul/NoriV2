@@ -47,8 +47,8 @@ def filon(phi, f, lmax, output):
     return output
 
 
-def filonIntegrate(f, nCoeffs, nEvals, a, b):
-    coeffs = np.zeros(nCoeffs)
+def filonIntegrate(f, nCoeffs, nEvals, a, b, coeffs):
+
     if abs(b - a) < 1e-15:
         return coeffs
 

@@ -81,16 +81,25 @@ def smithG1(v, m, alpha):
     return 1.0
 
 
-def getAB(mu_i, mu_o, eta, alpha):
+def getAB(mu_i, mu_o, etaC, alpha):
     reflect = (-mu_i * mu_o) > 0
+    conductor = (etaC.imag != 0.0)
     sinMu2 = f.safe_sqrt((1.0 - mu_i * mu_i) * (1.0 - mu_o * mu_o))
+    if -mu_i > 0.0 or conductor:
+        eta = etaC
+    else:
+        eta = complex(1.0, 0.0) / etaC
 
     if reflect:
+        #print("reflect")
         temp = 1.0 / (alpha * (mu_i - mu_o))
         A = (mu_i * mu_i + mu_o * mu_o - 2.0) * temp * temp
         B = 2.0 * sinMu2 * temp * temp
     else:
+        #print("refract")
         temp = 1.0 / (alpha * (mu_i - eta.real * mu_o))
+        #print("eta = " + str(eta))
+        #print("temp = " + str(temp))
         A = (mu_i * mu_i - 1.0 + eta.real * eta.real * (mu_o * mu_o - 1.0)) * temp * temp
         B = 2 * eta.real * sinMu2 * temp * temp
 
@@ -152,17 +161,17 @@ def microfacetNoExp(mu_o, mu_i, eta_, alpha, phi_d):
 
 
 def Bmax(n, relerr):
-    if relerr >= 1e-1:
+    if relerr >= float(1e-1):
         return 0.1662 * math.pow(n, 2.05039)
-    elif relerr >= 1e-2:
+    elif relerr >= float(1e-2):
         return 0.0818 * math.pow(n, 2.04982)
-    elif relerr >= 1e-3:
+    elif relerr >= float(1e-3):
         return 0.0538 * math.pow(n, 2.05001)
-    elif relerr >= 1e-4:
+    elif relerr >= float(1e-4):
         return 0.0406 * math.pow(n, 2.04686)
-    elif relerr >= 1e-5:
+    elif relerr >= float(1e-5):
         return 0.0337 * math.pow(n, 2.03865)
-    elif relerr >= 1e-6:
+    elif relerr >= float(1e-6):
         return 0.0299 * math.pow(n, 2.02628)
     else:
         print("Bmax(): unknown relative error bound!")
@@ -189,9 +198,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
     if reflect:
         if not conductor:
             if sinMu2 == 0:
-                print("reflect sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
-                      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
-                      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
+                #print("reflect sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
+                #      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+                #      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
                 temp = -1.0
             else:
                 temp = (2.0 * eta.real * eta.real - mu_i * mu_o - 1.0) / sinMu2
@@ -202,9 +211,9 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         else:
             etaDenser = 1.0 / eta.real
         if sinMu2 == 0:
-            print("refract sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
-                  str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
-                  str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
+            #print("refract sinMu2 == 0 mu_o = " + str(mu_o) + " mu_i = " +
+            #      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+            #      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
             temp = -1.0
         else:
             temp = (1.0 - etaDenser * mu_i * mu_o) / (etaDenser * sinMu2)
@@ -213,28 +222,30 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         #   Uh oh, some high frequency content leaked in the generally low frequency part.
         #   Increase the number of coefficients so that we can capture it. Fortunately, this
         #   happens very rarely.
-        print("Uh oh case mu_o = " + str(mu_o) + " mu_i = " +
-              str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
-              str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
+        #print("Uh oh case mu_o = " + str(mu_o) + " mu_i = " +
+        #      str(mu_i) + " etaC = " + str(etaC) + " alpha = " +
+        #      str(alpha) + " n = " + str(n) + " phiMax = " + str(phiMax))
         n = max(n, 100)
+
+    coeffs = np.zeros(n)
     # validated and tested length and value
     if reflect:
         if phiCritical > eps and phiCritical < phiMax - eps:
 
-            b1 = filonIntegrate(foo, n, nEvals, 0.0, phiCritical)
-            b2 = filonIntegrate(foo, n, nEvals, phiCritical, phiMax)
-            coeffs = np.concatenate((b1, b2), axis=0)
+            coeffs = filonIntegrate(foo, n, nEvals, 0.0, phiCritical, coeffs)
+            coeffs = filonIntegrate(foo, n, nEvals, phiCritical, phiMax, coeffs)
         else:
-            coeffs = filonIntegrate(foo, n, nEvals, 0.0, phiMax)
+            coeffs = filonIntegrate(foo, n, nEvals, 0.0, phiMax, coeffs)
 
     else:
-        coeffs = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax))
+        coeffs = filonIntegrate(foo, n, nEvals, 0.0, min(phiCritical, phiMax), coeffs)
         #minVal = min(phiCritical, phiMax)
         #print(minVal)
         #coeffs = ll.fourier.filonIntegrate(foo, n, nEvals, 0.0, minVal)
         #print(coeffs)
 
     if phiMax < np.pi - eps:
+        #print("OUR SVD")
         #  /* Precompute some sines and cosines */
         cosPhi = np.zeros(n)
         sinPhi = np.zeros(n)
@@ -263,6 +274,7 @@ def microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, n, phiMax):
         coeffs[1:n] *= 0.5 * np.pi
         for i in range(n):
             if sigma[i] < 1e-9 * sigma[0]:
+                #print("i = " + str(i))
                 break
             if len(coeffs) == len(U[:, i]):
                 temp += V[:, i] * np.dot(U[:, i], coeffs) / sigma[i]
@@ -289,11 +301,17 @@ def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
     A, B = getAB(mu_i, mu_o, etaC, alpha)
 
     # validate and tested
+    #print("A = " + str(A))
+    #print("B = " + str(B))
+    testValue = sp.i0e(B) * np.exp(A + B)
     if sp.i0e(B) * np.exp(A + B) < 1e-10:
         return [0.0]
 
+
+
     # validated visual
-    B_max = Bmax(n, relerr)
+    B_max = Bmax(n, float(relerr))
+
     if B > B_max:
         A = A + B - B_max + math.log(sp.i0e(B) / sp.i0e(B_max))
         B = B_max
@@ -301,7 +319,7 @@ def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
     # validated and tested with length and value
     expcos_coeffs = expcos_fseries(A, B, relerr)
     #llexpcos_coeffs = ll.expCosFourierSeries(A, B, relerr)
-    #print(np.sum(np.abs(expcos_coeffs -llexpcos_coeffs)))
+    #print("expcos_coeffs = " + str(np.sum(np.abs(expcos_coeffs -llexpcos_coeffs))))
 
     if B == 0.0:
         phiMax = f.safe_acos(-1.0)
@@ -311,6 +329,10 @@ def microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, relerr=10e-4):
     # validated length value is 0.00264447443559 PROBLEM IS THE SVD computation
 
     lowfreq_coeffs = microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, 12, phiMax)
+    lllowfreq_coeffs = ll.microfacetNoExpFourierSeries(mu_o, mu_i, etaC, alpha, 12, phiMax)
+    #print(len(lowfreq_coeffs))
+    #print(len(lllowfreq_coeffs))
+    #print("lowfreq_coeffs = " + str(np.sum(np.abs(lowfreq_coeffs -lllowfreq_coeffs))))
 
 
     # valid?

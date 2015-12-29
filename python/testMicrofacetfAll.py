@@ -12,9 +12,9 @@ import layerlab as ll
 n = 12
 phi = np.linspace(0.0,np.pi, n)
 
-mu_o = -0.452930232232
-mu_i = -0.024736727622
-alpha = 0.1
+mu_o = 0.792008291862
+mu_i = 0.652388702882
+alpha = 0.6
 etaC = complex(1.1, 0)
 
 cLL = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)

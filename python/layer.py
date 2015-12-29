@@ -103,17 +103,18 @@ class layer:
             for o in range(n):
                 #coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3)
                 llcoeffs = ll.microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3) # works good but paper is different
-                coeffs = microfacetFourierSeries( self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget)
+                coeffs = microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3)
 
                 if len(llcoeffs) == len(coeffs):
                     err = np.sum(np.abs(np.array(coeffs) - np.array(llcoeffs)))
-                    if err > 0:
+                    if err > 1e-6:
                         print("absolute error = " + str(err) + " mu_o = " + str(self.nodes[o]) + " mu_i = " + str(self.nodes[i]))
+                        print("======================================")
                 else:
                     print("len(expcos_coeffs) = " + str(len(coeffs)))
                     print("len(llexpcos_coeffs) = " + str(len(llcoeffs)))
                     print(" mu_o = " + str(self.nodes[o]) + " mu_i = " + str(self.nodes[i]))
-                print("======================================")
+                    print("======================================")
 
                 for l in range(min(fourierOrdersTarget, len(coeffs))):
                     if math.isnan(coeffs[l]):

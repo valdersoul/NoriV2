@@ -46,7 +46,6 @@ elif run == 2:
     coating.setMicrofacet(eta, alpha)
 
     for i in range(m):
-        print(i)
         plt.figure()
         temp = coating.scatteringMatrix[:, :, i]
         resHalf = n / 2
@@ -59,7 +58,9 @@ elif run == 2:
     coatingll = ll.Layer(mu, w, m)
     coatingll.setMicrofacet(eta=eta, alpha=alpha, conserveEnergy=False)
     for i in range(m):
-        SM = coatingll.matrix(i)
+        topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
+        bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
+        SM = np.concatenate((topRow, bottomRow), axis=0)    
 
 
         plt.figure()
@@ -81,7 +82,7 @@ elif run == 2:
         Rt = np.sum(np.abs(coating.getRt(i) - coatingll[i].reflectionTop))
         Tbt = np.sum(np.abs(coating.getTbt(i) - coatingll[i].transmissionBottomTop))
         globalErr = np.sum(np.abs(SM - temp))
-        print("Global = " + str(globalErr))
-        print (str(TtbErr) + ", " + str(RbErr))
-        print (str(Rt) + ", " + str(TtbErr))
+        #print("Global = " + str(globalErr))
+        #print (str(TtbErr) + ", " + str(RbErr))
+        #print (str(Rt) + ", " + str(TtbErr))
 
