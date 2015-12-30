@@ -3,49 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e4c34ff3-98e3-4227-9029-46ff1170dce8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Coeff.pdf" afterPath="$PROJECT_DIR$/Coeff.pdf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet0.png" afterPath="$PROJECT_DIR$/images/errmicrofacet0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet1.png" afterPath="$PROJECT_DIR$/images/errmicrofacet1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet10.png" afterPath="$PROJECT_DIR$/images/errmicrofacet10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet11.png" afterPath="$PROJECT_DIR$/images/errmicrofacet11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet2.png" afterPath="$PROJECT_DIR$/images/errmicrofacet2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet3.png" afterPath="$PROJECT_DIR$/images/errmicrofacet3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet4.png" afterPath="$PROJECT_DIR$/images/errmicrofacet4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet5.png" afterPath="$PROJECT_DIR$/images/errmicrofacet5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet6.png" afterPath="$PROJECT_DIR$/images/errmicrofacet6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet7.png" afterPath="$PROJECT_DIR$/images/errmicrofacet7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet8.png" afterPath="$PROJECT_DIR$/images/errmicrofacet8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/errmicrofacet9.png" afterPath="$PROJECT_DIR$/images/errmicrofacet9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet0.png" afterPath="$PROJECT_DIR$/images/llmicrofacet0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet1.png" afterPath="$PROJECT_DIR$/images/llmicrofacet1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet10.png" afterPath="$PROJECT_DIR$/images/llmicrofacet10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet11.png" afterPath="$PROJECT_DIR$/images/llmicrofacet11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet2.png" afterPath="$PROJECT_DIR$/images/llmicrofacet2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet3.png" afterPath="$PROJECT_DIR$/images/llmicrofacet3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet4.png" afterPath="$PROJECT_DIR$/images/llmicrofacet4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet5.png" afterPath="$PROJECT_DIR$/images/llmicrofacet5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet6.png" afterPath="$PROJECT_DIR$/images/llmicrofacet6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet7.png" afterPath="$PROJECT_DIR$/images/llmicrofacet7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet8.png" afterPath="$PROJECT_DIR$/images/llmicrofacet8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/llmicrofacet9.png" afterPath="$PROJECT_DIR$/images/llmicrofacet9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet0.png" afterPath="$PROJECT_DIR$/images/microfacet0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet1.png" afterPath="$PROJECT_DIR$/images/microfacet1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet10.png" afterPath="$PROJECT_DIR$/images/microfacet10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet11.png" afterPath="$PROJECT_DIR$/images/microfacet11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet2.png" afterPath="$PROJECT_DIR$/images/microfacet2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet3.png" afterPath="$PROJECT_DIR$/images/microfacet3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet4.png" afterPath="$PROJECT_DIR$/images/microfacet4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet5.png" afterPath="$PROJECT_DIR$/images/microfacet5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet6.png" afterPath="$PROJECT_DIR$/images/microfacet6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet7.png" afterPath="$PROJECT_DIR$/images/microfacet7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet8.png" afterPath="$PROJECT_DIR$/images/microfacet8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/microfacet9.png" afterPath="$PROJECT_DIR$/images/microfacet9.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/layerlab.so" afterPath="$PROJECT_DIR$/layerlab.so" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/filon.py" afterPath="$PROJECT_DIR$/filon.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/layer.py" afterPath="$PROJECT_DIR$/layer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/microfacet.py" afterPath="$PROJECT_DIR$/microfacet.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testLayer.py" afterPath="$PROJECT_DIR$/testLayer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testMicrofacetfAll.py" afterPath="$PROJECT_DIR$/testMicrofacetfAll.py" />
     </list>
     <ignored path="python.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -91,8 +51,8 @@
       <file leaf-file-name="testLayer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/testLayer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49594814">
-              <caret line="62" column="60" selection-start-line="62" selection-start-column="60" selection-end-line="62" selection-end-column="60" />
+            <state vertical-scroll-proportion="0.3873582">
+              <caret line="19" column="38" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="38" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -849,8 +809,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/testLayer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49594814">
-          <caret line="62" column="60" selection-start-line="62" selection-start-column="60" selection-end-line="62" selection-end-column="60" />
+        <state vertical-scroll-proportion="0.3873582">
+          <caret line="19" column="38" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="38" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

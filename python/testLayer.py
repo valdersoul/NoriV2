@@ -12,8 +12,20 @@ mu, w = gausLobatto(n) #Valid
 m = 12
 eta = complex(1.1, 0.0)
 alpha = 0.6
-run = 2
-if run == 1:
+run = 0
+if run == 0:
+    diffuseLayer = layer(mu, w, m)
+    diffuseLayer.setDiffuse(0.8)
+    llLayer = ll.Layer(mu, w, m)
+    SM = diffuseLayer.scatteringMatrix[:, :, 0]
+
+    ll.setScatteringMatrix(llLayer, SM, 0)
+    output = [llLayer, llLayer, llLayer]
+    print("Writing to disk..")
+    storage = ll.BSDFStorage.fromLayerRGB("output.bsdf", *output)
+    storage.close()
+
+elif run == 1:
     diffuseLayer = layer(mu, w, m)
     diffuseLayer.setDiffuse(0.8)
     temp = diffuseLayer.scatteringMatrix[:, :, 0]
@@ -60,7 +72,7 @@ elif run == 2:
     for i in range(m):
         topRow = np.concatenate((coatingll[i].transmissionTopBottom, coatingll[i].reflectionBottom), axis=1)
         bottomRow = np.concatenate((coatingll[i].reflectionTop, coatingll[i].transmissionBottomTop), axis=1)
-        SM = np.concatenate((topRow, bottomRow), axis=0)    
+        SM = np.concatenate((topRow, bottomRow), axis=0)
 
 
         plt.figure()
