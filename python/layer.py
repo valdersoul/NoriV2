@@ -21,35 +21,35 @@ class layer:
     def fourierOrders(self):
         return self.modes
 
-    def getTtb(self, k):
+    def getTbt(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[:resHalf, :resHalf, k]
 
-    def getRb(self, k):
+    def getRt(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[:resHalf, resHalf:, k]
 
-    def getRt(self, k):
+    def getRb(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[resHalf:, :resHalf, k]
 
-    def getTbt(self, k):
+    def getTtb(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[resHalf:, resHalf:, k]
 
-    def setTtb(self, M, k):
+    def setTbt(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[:resHalf, :resHalf, k] = M
 
-    def setRb(self, M, k):
+    def setRt(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[:resHalf, resHalf:, k] = M
 
-    def setRt(self, M, k):
+    def setRb(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[resHalf:, :resHalf, k] = M
 
-    def setTbt(self, M, k):
+    def setTtb(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[resHalf:, resHalf:, k] = M
 
@@ -100,7 +100,7 @@ class layer:
         FL = np.zeros((n, n, fourierOrdersTarget))
         for i in range(n):
             for o in range(n):
-                coeffs = ll.microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget,
+                coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget,
                                                     10e-4)
                 # coeffs = microfacetFourierSeries( self.nodes[o],  self.nodes[i], eta, alpha, fourierOrdersTarget)
                 for l in range(len(coeffs[:fourierOrdersTarget])):
