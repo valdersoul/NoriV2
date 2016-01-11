@@ -71,6 +71,7 @@ add_executable(nori
 
   # Cameras
   src/Cameras/perspective.cpp
+  src/Cameras/thinlens.cpp
 
   # Core
   src/Core/bitmap.cpp
