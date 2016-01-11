@@ -16,41 +16,73 @@ class layer:
             self.weights[:nHalf] = (self.weights[:nHalf])[::-1]
             self.nodes[:nHalf] = (self.nodes[:nHalf])[::-1]
 
+    @staticmethod
+    def addToTop(l1, l2):
+        n = l1.resolution() / 2
+        I = np.identity(n)
+
+        for i in range(l1.fourierOrders()):
+            G_tb = (I - np.dot(l1.getRb(i), l2.getRt(i)))
+
+            G_bt = (I - np.dot(l2.getRt(i), l1.getRb(i)))
+
+            result = np.linalg.solve(G_tb, l1.getTtb(i))
+            Ttb = np.dot(l2.getTtb(i), result)
+
+            temp = np.dot(l1.getRb(i), l2.getTbt(i))
+            result = np.linalg.solve(G_tb, temp)
+            Rb = l2.getRb(i) + np.dot(l2.getTtb(i), result)
+
+            result = np.linalg.solve(G_bt, l2.getTbt(i))
+            Tbt = np.dot(l1.getTbt(i), result)
+
+            temp = np.dot(l2.getRt(i), l1.getTtb(i))
+            result = np.linalg.solve(G_bt, temp)
+            Rt = l1.getRt(i) + np.dot(l1.getTbt(i), result)
+
+            l2.setRt(Rt, i)
+            l2.setRb(Rb, i)
+            l2.setTtb(Ttb, i)
+            l2.setTbt(Tbt, i)
+
+        return l2
+
+
     def resolution(self):
         return len(self.nodes)
 
     def fourierOrders(self):
         return self.modes
 
-    def getTtb(self, k):
+    def getTbt(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[:resHalf, :resHalf, k]
 
-    def getRb(self, k):
+    def getRt(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[:resHalf, resHalf:, k]
 
-    def getRt(self, k):
+    def getRb(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[resHalf:, :resHalf, k]
 
-    def getTbt(self, k):
+    def getTtb(self, k):
         resHalf = self.resolution() / 2
         return self.scatteringMatrix[resHalf:, resHalf:, k]
 
-    def setTtb(self, M, k):
+    def setTbt(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[:resHalf, :resHalf, k] = M
 
-    def setRb(self, M, k):
+    def setRt(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[:resHalf, resHalf:, k] = M
 
-    def setRt(self, M, k):
+    def setRb(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[resHalf:, :resHalf, k] = M
 
-    def setTbt(self, M, k):
+    def setTtb(self, M, k):
         resHalf = self.resolution() / 2
         self.scatteringMatrix[resHalf:, resHalf:, k] = M
 
@@ -86,7 +118,7 @@ class layer:
         n = self.resolution()
         F = np.zeros((n, n))
         h = int(n / 2)
-        self.scatteringMatrix = np.zeros((n, n, 1))
+        self.scatteringMatrix = np.zeros((n, n, self.fourierOrders()))
         for i in range(n):
             for o in range(n):
                 if ((i < h and o >= h) or (o < h and i >= h)):
@@ -101,10 +133,9 @@ class layer:
         FL = np.zeros((n, n, fourierOrdersTarget))
         for i in range(n):
             for o in range(n):
-                #coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3)
-                llcoeffs = ll.microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3) # works good but paper is different
-                coeffs = microfacetFourierSeries(self.nodes[o], self.nodes[i], eta, alpha, fourierOrdersTarget, 10e-3)
-
+                coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3) # works good but paper is different
+                #  coeffs = microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3)
+                """
                 if len(llcoeffs) == len(coeffs):
                     err = np.sum(np.abs(np.array(coeffs) - np.array(llcoeffs)))
                     if err > 1e-6:
@@ -115,6 +146,7 @@ class layer:
                     print("len(llexpcos_coeffs) = " + str(len(llcoeffs)))
                     print(" mu_o = " + str(self.nodes[o]) + " mu_i = " + str(self.nodes[i]))
                     print("======================================")
+                """
 
                 for l in range(min(fourierOrdersTarget, len(coeffs))):
                     if math.isnan(coeffs[l]):
