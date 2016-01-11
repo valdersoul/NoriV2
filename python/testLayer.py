@@ -12,12 +12,12 @@ mu, w = gausLobatto(n) #Valid
 m = 12
 eta = complex(1.1, 0.0)
 alpha = 0.6
-run = 1
+run = 0
 if run == 0:
     diffuseLayer = layer(mu, w, m)
     diffuseLayer.setDiffuse(0.8)
     llLayer = ll.Layer(mu, w, m)
-    SM = diffuseLayer.scatteringMatrix[:, :, 0]
+    SM = np.copy(diffuseLayer.scatteringMatrix[:, :, 0])
 
     ll.setScatteringMatrix(llLayer, SM, 0)
     output = [llLayer, llLayer, llLayer]

@@ -60,13 +60,13 @@ for channel in range(3):
 
     # Apply coating
     print("1. Applying coating..")
-    output.append(l) #layer.addToTop(coating, l))
+    output.append(layer.addToTop(coating, l))
 
 outputForReal = []
 for channel in range(3):
     llLayer = ll.Layer(mu, w, m)
     for i in range(m):
-        SM = output[channel].scatteringMatrix[:, :, i]
+        SM = np.copy(output[channel].scatteringMatrix[:, :, i])
 
         ll.setScatteringMatrix(llLayer, SM, i)
     outputForReal.append(llLayer)
@@ -98,7 +98,7 @@ storage = ll.BSDFStorage.fromLayerRGB("lloutput.bsdf", *lloutput )
 storage.close()
 
 
-for i in range(m):
+for i in range(12):
     SM1 = output[0].scatteringMatrix[:, :, i]
     SM2 = getMatrix(lloutput[0], i)
     printMatrix(SM1, SM2, i)
