@@ -51,6 +51,15 @@ class layer:
     def resolution(self):
         return len(self.nodes)
 
+    def setScatteringMatrix(self, M):
+        n = self.resolution()
+        self.scatteringMatrix = np.zeros((n, n, self.fourierOrders()))
+        for l in range(self.fourierOrders()):
+            self.setTbt(M[l].transmissionBottomTop, l)
+            self.setTtb(M[l].transmissionTopBottom, l)
+            self.setRb(M[l].reflectionBottom, l)
+            self.setRt(M[l].reflectionTop, l)
+
     def fourierOrders(self):
         return self.modes
 
@@ -133,8 +142,8 @@ class layer:
         FL = np.zeros((n, n, fourierOrdersTarget))
         for i in range(n):
             for o in range(n):
-                coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3) # works good but paper is different
-                #  coeffs = microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3)
+                #coeffs = ll.microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3) # works good but paper is different
+                coeffs = microfacetFourierSeries(-self.nodes[o], -self.nodes[i], eta, alpha, fourierOrdersTarget, 1e-3)
                 """
                 if len(llcoeffs) == len(coeffs):
                     err = np.sum(np.abs(np.array(coeffs) - np.array(llcoeffs)))

@@ -9,29 +9,16 @@ from fourierBasic import fourierEval
 import layerlab as ll
 
 
-n = 12
-phi = np.linspace(0.0,np.pi, n)
+n = 200
+phi = np.linspace(0.0, np.pi, n)
 
-mu_o = 0.792008291862
-mu_i = 0.652388702882
-alpha = 0.6
+mu_o = -0.6
+mu_i = 0.5
+alpha = 0.05
 etaC = complex(1.1, 0)
 
-cLL = ll.microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
-cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 10e-4)
 
-print("Our coeff: " + str(len(cOur)))
-print("ll coeff: " + str(len(cLL)))
-
-plt.figure()
-plt.plot(cOur, 'b')
-plt.plot(cLL, 'r--')
-plt.savefig("Coeff.pdf")
-if len(cOur) == len(cLL):
-    print("absolute error = " + str(np.sum(np.abs(np.array(cOur) - np.array(cLL)))))
-else:
-    print("len(expcos_coeffs) = " + str(len(cOur)))
-    print("len(llexpcos_coeffs) = " + str(len(cLL )))
+cOur = microfacetFourierSeries(mu_o, mu_i, etaC, alpha, n, 1e-3)
 
 
 yOur = fourierEval(cOur, phi)
@@ -39,11 +26,25 @@ yOur = fourierEval(cOur, phi)
 yLL = ll.microfacet(mu_o, mu_i, etaC, alpha, phi)
 
 plt.figure()
-plt.plot(phi, yOur, 'b')
-plt.plot(phi, yLL, 'r--')
+plt.plot(phi, yLL, 'b')
+x1,x2,y1,y2 = plt.axis()
+plt.axis((y1,y2,0.0,1.0))
+plt.axis((x1,x2,0.0,1.0))
+
 plt.ylabel('Value')
-plt.xlabel('Phi_d')
-plt.title('Microfacet fourier approximation')
-plt.legend(['Fourier approximation', 'Orignal function'])
-plt.savefig("MicrofacetgraphAll.png")
+plt.xlabel('Phi')
+plt.title('Microfacet BSDF')
+plt.savefig("MBSDF.png")
+
+plt.figure()
+plt.plot(phi, yOur, 'r')
+x1,x2,y1,y2 = plt.axis()
+plt.axis((y1,y2,0.0,1.0))
+plt.axis((x1,x2,0.0,1.0))
+plt.ylabel('Value')
+plt.xlabel('Phi')
+plt.title('Microfacet BSDF Fourier Approximation')
+plt.savefig("MBSDFF.png")
+
+
 

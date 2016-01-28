@@ -98,7 +98,7 @@ storage = ll.BSDFStorage.fromLayerRGB("lloutput.bsdf", *lloutput )
 storage.close()
 
 
-for i in range(12):
+for i in range(30):
     SM1 = output[0].scatteringMatrix[:, :, i]
     SM2 = getMatrix(lloutput[0], i)
     printMatrix(SM1, SM2, i)

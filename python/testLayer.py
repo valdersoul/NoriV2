@@ -120,3 +120,5 @@ elif run == 4:
     print("Writing to disk..")
     storage = ll.BSDFStorage.fromLayerRGB("ourOutput.bsdf", *output)
     storage.close()
+
+elif run == 5:
