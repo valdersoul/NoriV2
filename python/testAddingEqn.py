@@ -16,15 +16,18 @@ def getMatrix(output, i):
     SM = np.concatenate((topRow, bottomRow), axis=0)
     return SM
 
-def printMatrix(SM1, SM2, i):
+def printMatrix(SM1, SM2, SM3, i, prefix):
     plt.figure()
-    plt.subplot(1,2,1)
-    plt.title('OUR')
+    plt.subplot(1,3,1)
+    plt.title('RED')
     plt.imshow(SM1)
-    plt.subplot(1,2,2)
-    plt.title('ll')
+    plt.subplot(1,3,2)
+    plt.title('GREEN')
     plt.imshow(SM2)
-    plt.savefig('images/addComp' + str(i) + '.png')
+    plt.subplot(1,3,3)
+    plt.title('BLUE')
+    plt.imshow(SM3)
+    plt.savefig('images/addComp' + prefix + str(i) + '.png')
 
 albedo = 0.5
 eta_top = 1.5
@@ -100,7 +103,14 @@ storage.close()
 
 for i in range(30):
     SM1 = output[0].scatteringMatrix[:, :, i]
-    SM2 = getMatrix(lloutput[0], i)
-    printMatrix(SM1, SM2, i)
+    SM2 = output[1].scatteringMatrix[:, :, i]
+    SM3 = output[2].scatteringMatrix[:, :, i]
+    
+    printMatrix(SM1, SM2, SM3, i, 'our')
+    
+    SM1 = getMatrix(lloutput[0], i)
+    SM2 = getMatrix(lloutput[1], i)
+    SM3 = getMatrix(lloutput[2], i)
+    printMatrix(SM1, SM2, SM3, i, 'orig')
 
 

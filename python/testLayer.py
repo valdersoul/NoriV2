@@ -14,15 +14,27 @@ eta = complex(1.1, 0.0)
 alpha = 0.6
 run = 0
 if run == 0:
-    diffuseLayer = layer(mu, w, m)
-    diffuseLayer.setDiffuse(0.8)
-    llLayer = ll.Layer(mu, w, m)
-    SM = np.copy(diffuseLayer.scatteringMatrix[:, :, 0])
+    diffuseLayerR = layer(mu, w, m)
+    diffuseLayerR.setDiffuse(1.0)
+    llLayerR = ll.Layer(mu, w, m)
+    SMR = np.copy(diffuseLayerR.scatteringMatrix[:, :, 0])
+    ll.setScatteringMatrix(llLayerR, SMR, 0)
 
-    ll.setScatteringMatrix(llLayer, SM, 0)
-    output = [llLayer, llLayer, llLayer]
+    diffuseLayerG = layer(mu, w, m)
+    diffuseLayerG.setDiffuse(0.0)
+    llLayerG = ll.Layer(mu, w, m)
+    SMG = np.copy(diffuseLayerG.scatteringMatrix[:, :, 0])
+    ll.setScatteringMatrix(llLayerG, SMG, 0)
+
+    diffuseLayerB = layer(mu, w, m)
+    diffuseLayerB.setDiffuse(0.0)
+    llLayerB = ll.Layer(mu, w, m)
+    SMB = np.copy(diffuseLayerB.scatteringMatrix[:, :, 0])
+    ll.setScatteringMatrix(llLayerB, SMB, 0)
+
+    output = [llLayerR, llLayerG, llLayerB]
     print("Writing to disk..")
-    storage = ll.BSDFStorage.fromLayerRGB("ourOutput.bsdf", *output)
+    storage = ll.BSDFStorage.fromLayerRGB("diffuse.bsdf", *output)
     storage.close()
 
 elif run == 1:
@@ -107,18 +119,15 @@ elif run == 3:
 
 elif run == 4:
 
-    diffuseLayer = ll.Layer(mu, w, m)
-    diffuseLayer.setDiffuse(0.8)
-    i = 0
-    topRow = np.concatenate((diffuseLayer[i].transmissionBottomTop, diffuseLayer[i].reflectionTop), axis=1)
-    bottomRow = np.concatenate((diffuseLayer[i].reflectionBottom, diffuseLayer[i].transmissionTopBottom), axis=1)
-    SM = np.concatenate((topRow, bottomRow), axis=0)
+    llLayerR = ll.Layer(mu, w, m)
+    llLayerR.setDiffuse(1.0)
+    
+    llLayerG = ll.Layer(mu, w, m)
+    llLayerG.setDiffuse(0.0)
 
-    llLayer = ll.Layer(mu, w, m)
-    ll.setScatteringMatrix(llLayer, SM, 0)
-    output = [llLayer, llLayer, llLayer]
+    llLayerB = ll.Layer(mu, w, m)
+    llLayerB.setDiffuse(0.0)
+    output = [llLayerR, llLayerG, llLayerB]
     print("Writing to disk..")
-    storage = ll.BSDFStorage.fromLayerRGB("ourOutput.bsdf", *output)
+    storage = ll.BSDFStorage.fromLayerRGB("diffusell.bsdf", *output)
     storage.close()
-
-elif run == 5:
